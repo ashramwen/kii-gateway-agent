@@ -1,24 +1,44 @@
-/// <reference types="node" />
-/// <reference types="lowdb" />
+/// <reference types='node' />
+/// <reference types='lowdb' />
 import Q = require('q');
 import low = require('lowdb');
 import macaddress = require('macaddress');
+import fs = require('fs');
 
 import { App, EndNode, Gateway, User } from './model/index';
-import { init } from './init';
 import { KiiHelper } from './KiiHelper/KiiHelper';
 
 class KiiGatewayAgent {
-  kii: KiiHelper;
-  db;
-  constructor() {
-    init();
-    this.db = new low('./resource/db.json');
+  static preinit() {
+    const dir = './resource';
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    let db = new low('./resource/db.json');
+    db.defaults({
+      app: {
+        'appID': 'appID',
+        'appKey': 'appKey',
+        'site': 'https://api-sg.kii.com'
+      }, user: {
+        'ownerToken': 'ownerToken',
+        'userID': 'userID'
+      }, gateway: {}, endNodes: []
+    }).value();
   }
 
-  // kii init
-  init(_appID: string, _appKey: string, _site) {
-    this.kii = new KiiHelper(_appID, _appKey, _site);
+  kii: KiiHelper;
+  db: any;
+  constructor() {
+    KiiGatewayAgent.preinit();
+    this.kii = new KiiHelper();
+    this.db = new low('./resource/db.json');
+    this.kii.app = this.db.get('app').value() as App;
+    this.kii.user = this.db.get('user').value() as User;
+  }
+
+  setApp(_appID: string, _appKey: string, _site: string) {
+    this.kii.setApp(_appID, _appKey, _site);
     this.db.set('app', this.kii.app).value();
   }
 
@@ -54,7 +74,7 @@ class KiiGatewayAgent {
   }
 
   // update endnode state
-  updateEndnodeState(endNodeThingID: string, states) {
+  updateEndnodeState(endNodeThingID: string, states?) {
     let deferred = Q.defer()
     this.kii.updateEndnodeState(endNodeThingID, states).then(
       res => deferred.resolve(res),

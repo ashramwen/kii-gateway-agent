@@ -19,19 +19,20 @@ const endnodeThingID = 'th.ba28b2d34b60-3deb-6e11-412e-0dad41ca';
 
 describe('Kii Gateway Agent', () => {
   let gatewayAgent = new KiiGatewayAgent();
-  describe('.init()', () => {
-    it('should set appID, appKey, site', done => {
-      gatewayAgent.init(appID, appKey, site);
-      done();
-    })
-  });
 
-  describe('.setUser()', () => {
-    it('should set userId, userToken', done => {
-      gatewayAgent.setUser(ownerToken, ownerID);
-      done();
-    })
-  });
+  // describe('.setApp()', () => {
+  //   it('should set appID, appKey, site', done => {
+  //     gatewayAgent.setApp(appID, appKey, site);
+  //     done();
+  //   })
+  // });
+
+  // describe('.setUser()', () => {
+  //   it('should set userId, userToken', done => {
+  //     gatewayAgent.setUser(ownerToken, ownerID);
+  //     done();
+  //   })
+  // });
 
   describe('.onboardGatewayByOwner()', () => {
     let result

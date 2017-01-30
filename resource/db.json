@@ -1,10 +1,19 @@
 {
+  "app": {
+    "appID": "a333fe49",
+    "appKey": "ddab3f01d0eda5b73051c660134359fc",
+    "site": "https://api-sg.kii.com"
+  },
+  "user": {
+    "ownerToken": "h6QKPtb8S2THnUusf6xMCXUv2MWzmRbZY8TVf0_Mzxc",
+    "userID": "7c698b427320-f689-6e11-91ed-00c48d05"
+  },
   "gateway": {
     "type": "EnergyGateway",
     "password": "12345",
     "vendorThingID": "3c15c2d23a38",
     "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0e56ca79",
-    "accessToken": "0GeJ4h0_xjXNYQRshA70IP4oCQUMcKTRW6_lJ-GDm_8",
+    "accessToken": "6koZVPMptbFRVxZg8IPHqugFTOtOGl1doY9YYhrfPSU",
     "mqttEndpoint": {
       "installationID": "qhi8z9azgsq3nmm8rjptadunb",
       "username": "a333fe49-IkdBUfnkHo0wSXCzgFBQmHb",
@@ -18,22 +27,13 @@
       "ttl": 2147483647
     }
   },
-  "user": {
-    "ownerToken": "h6QKPtb8S2THnUusf6xMCXUv2MWzmRbZY8TVf0_Mzxc",
-    "userID": "7c698b427320-f689-6e11-91ed-00c48d05"
-  },
   "endNodes": [
     {
       "type": "EnergyNodey",
       "password": "12345",
       "vendorThingID": "Donkey",
       "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0dad41ca",
-      "accessToken": "nFcfAqN2BuNEm5EsyemReF0VCRJuB8QljuhpOl3vY30"
+      "accessToken": "AnwJWHVBZLqLkq8fqhpP_DusOL7ddKdLruYGh3PZJ2c"
     }
-  ],
-  "app": {
-    "appID": "a333fe49",
-    "appKey": "a333fe49",
-    "site": "https://api-sg.kii.com"
-  }
+  ]
 }

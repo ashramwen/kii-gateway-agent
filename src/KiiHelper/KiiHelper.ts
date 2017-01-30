@@ -9,9 +9,12 @@ export class KiiHelper {
   user: User;
   gateway: Gateway;
 
-  constructor(_appID, _appKey, _site) {
-    this.app = new App(_appID, _appID, _site);
+  constructor() {
     this.gateway = new Gateway();
+  }
+
+  setApp(_appID, _appKey, _site) {
+    this.app = new App(_appID, _appKey, _site);
   }
 
   setUser(ownerToken, ownerID) {

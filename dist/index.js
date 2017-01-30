@@ -1,15 +1,35 @@
 "use strict";
 var Q = require("q");
 var low = require("lowdb");
-var init_1 = require("./init");
+var fs = require("fs");
 var KiiHelper_1 = require("./KiiHelper/KiiHelper");
 var KiiGatewayAgent = (function () {
     function KiiGatewayAgent() {
-        init_1.init();
+        KiiGatewayAgent.preinit();
+        this.kii = new KiiHelper_1.KiiHelper();
         this.db = new low('./resource/db.json');
+        this.kii.app = this.db.get('app').value();
+        this.kii.user = this.db.get('user').value();
     }
-    KiiGatewayAgent.prototype.init = function (_appID, _appKey, _site) {
-        this.kii = new KiiHelper_1.KiiHelper(_appID, _appKey, _site);
+    KiiGatewayAgent.preinit = function () {
+        var dir = './resource';
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
+        var db = new low('./resource/db.json');
+        db.defaults({
+            app: {
+                'appID': 'appID',
+                'appKey': 'appKey',
+                'site': 'https://api-sg.kii.com'
+            }, user: {
+                'ownerToken': 'ownerToken',
+                'userID': 'userID'
+            }, gateway: {}, endNodes: []
+        }).value();
+    };
+    KiiGatewayAgent.prototype.setApp = function (_appID, _appKey, _site) {
+        this.kii.setApp(_appID, _appKey, _site);
         this.db.set('app', this.kii.app).value();
     };
     KiiGatewayAgent.prototype.setUser = function (ownerToken, ownerID) {

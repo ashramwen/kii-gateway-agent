@@ -1,15 +1,18 @@
+/// <reference types="q" />
+import Q = require('q');
 import { EndNode } from './model/index';
 import { KiiHelper } from './KiiHelper/KiiHelper';
 declare class KiiGatewayAgent {
+    static preinit(): void;
     kii: KiiHelper;
     db: any;
     constructor();
-    init(_appID: string, _appKey: string, _site: any): void;
+    setApp(_appID: string, _appKey: string, _site: string): void;
     setUser(ownerToken: string, ownerID: string): void;
-    onboardGatewayByOwner(properties?: any): any;
-    onboardEndnodeByOwner(endNodeVendorThingID: string, properties?: any): any;
-    updateEndnodeState(endNodeThingID: string, states: any): any;
-    updateEndnodeConnectivity(endNodeThingID: string, online: boolean): any;
+    onboardGatewayByOwner(properties?: any): Q.Promise<{}>;
+    onboardEndnodeByOwner(endNodeVendorThingID: string, properties?: any): Q.Promise<{}>;
+    updateEndnodeState(endNodeThingID: string, states?: any): Q.Promise<{}>;
+    updateEndnodeConnectivity(endNodeThingID: string, online: boolean): Q.Promise<{}>;
     detectEndnodeOnboardingStatus(endNodeVendorThingID: string): EndNode;
 }
 export = KiiGatewayAgent;

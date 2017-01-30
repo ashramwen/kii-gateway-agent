@@ -1,12 +1,15 @@
+/// <reference types="q" />
+import Q = require('q');
 import { App, Gateway, User } from '../model';
 export declare class KiiHelper {
     app: App;
     user: User;
     gateway: Gateway;
-    constructor(_appID: any, _appKey: any, _site: any);
+    constructor();
+    setApp(_appID: any, _appKey: any, _site: any): void;
     setUser(ownerToken: any, ownerID: any): void;
-    onboardGatewayByOwner(properties?: any): any;
-    onboardEndnodeByOwner(endNodeVendorThingID: any, properties?: any): any;
-    updateEndnodeState(endNodeThingID: any, states: any): any;
-    updateEndnodeConnectivity(endNodeThingID: string, online: boolean): any;
+    onboardGatewayByOwner(properties?: any): Q.Promise<{}>;
+    onboardEndnodeByOwner(endNodeVendorThingID: any, properties?: any): Q.Promise<{}>;
+    updateEndnodeState(endNodeThingID: any, states: any): Q.Promise<{}>;
+    updateEndnodeConnectivity(endNodeThingID: string, online: boolean): Q.Promise<{}>;
 }

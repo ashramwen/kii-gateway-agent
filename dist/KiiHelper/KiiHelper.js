@@ -3,10 +3,12 @@ var Q = require("q");
 var request = require("request");
 var model_1 = require("../model");
 var KiiHelper = (function () {
-    function KiiHelper(_appID, _appKey, _site) {
-        this.app = new model_1.App(_appID, _appID, _site);
+    function KiiHelper() {
         this.gateway = new model_1.Gateway();
     }
+    KiiHelper.prototype.setApp = function (_appID, _appKey, _site) {
+        this.app = new model_1.App(_appID, _appKey, _site);
+    };
     KiiHelper.prototype.setUser = function (ownerToken, ownerID) {
         this.user = new model_1.User(ownerToken, ownerID);
     };
