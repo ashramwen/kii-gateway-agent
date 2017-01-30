@@ -1,6 +1,6 @@
 import expect = require('expect.js');
 import request = require('request');
-import GatewayAgent = require('./index');
+import KiiGatewayAgent = require('./index');
 
 // const appID = 'f1e14d7c';
 // const appKey = 'b5727ac2e89ff44268fd628c12da7d61';
@@ -18,13 +18,10 @@ const gatewayThingID = 'th.ba28b2d34b60-3deb-6e11-412e-0e56ca79';
 const endnodeThingID = 'th.ba28b2d34b60-3deb-6e11-412e-0dad41ca';
 
 describe('Kii Gateway Agent', () => {
-  let gatewayAgent = new GatewayAgent.KiiGatewayAgent();
+  let gatewayAgent = new KiiGatewayAgent();
   describe('.init()', () => {
     it('should set appID, appKey, site', done => {
       gatewayAgent.init(appID, appKey, site);
-      // expect(gatewayAgent.appID).to.be(appID);
-      // expect(gatewayAgent.appKey).to.be(appKey);
-      // expect(gatewayAgent.site).to.be(site);
       done();
     })
   });
@@ -32,9 +29,6 @@ describe('Kii Gateway Agent', () => {
   describe('.setUser()', () => {
     it('should set userId, userToken', done => {
       gatewayAgent.setUser(ownerToken, ownerID);
-      // expect(gatewayAgent.appID).to.be(appID);
-      // expect(gatewayAgent.appKey).to.be(appKey);
-      // expect(gatewayAgent.site).to.be(site);
       done();
     })
   });
@@ -48,6 +42,7 @@ describe('Kii Gateway Agent', () => {
           done();
         }, error => {
           console.log(error);
+          done();
         })
     })
     it('should onboard gateway', () => {
@@ -63,10 +58,11 @@ describe('Kii Gateway Agent', () => {
         'Donkey', // endnode vendorThingID
         undefined // endnode properties
       ).then(chainOutput => {
-        result = chainOutput
-        done()
+        result = chainOutput;
+        done();
       }, error => {
         console.log(error);
+        done();
       })
     })
     it('should onboard end node', () => {
@@ -88,10 +84,11 @@ describe('Kii Gateway Agent', () => {
           }
         } // endnode states
       ).then(chainOutput => {
-        result = chainOutput
-        done()
+        result = chainOutput;
+        done();
       }, error => {
         console.log(error);
+        done();
       })
     })
     it('should update endnode states', () => {
@@ -110,6 +107,7 @@ describe('Kii Gateway Agent', () => {
         done()
       }, error => {
         console.log(error);
+        done();
       })
     })
     it('should update endnode connection status', () => {

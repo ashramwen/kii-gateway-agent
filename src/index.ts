@@ -8,7 +8,7 @@ import { App, EndNode, Gateway, User } from './model/index';
 import { init } from './init';
 import { KiiHelper } from './KiiHelper/KiiHelper';
 
-export class KiiGatewayAgent {
+class KiiGatewayAgent {
   kii: KiiHelper;
   db;
   constructor() {
@@ -124,3 +124,5 @@ export class KiiGatewayAgent {
   //     this.messageHandler = messageHandler
   // }
 }
+
+export = KiiGatewayAgent;
