@@ -1,6 +1,6 @@
 import { EndNode } from './model/index';
 import { KiiHelper } from './KiiHelper/KiiHelper';
-export declare class KiiGatewayAgent {
+declare class KiiGatewayAgent {
     kii: KiiHelper;
     db: any;
     constructor();
@@ -12,3 +12,4 @@ export declare class KiiGatewayAgent {
     updateEndnodeConnectivity(endNodeThingID: string, online: boolean): any;
     detectEndnodeOnboardingStatus(endNodeVendorThingID: string): EndNode;
 }
+export = KiiGatewayAgent;

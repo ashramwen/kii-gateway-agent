@@ -55,4 +55,4 @@ var KiiGatewayAgent = (function () {
     };
     return KiiGatewayAgent;
 }());
-exports.KiiGatewayAgent = KiiGatewayAgent;
+module.exports = KiiGatewayAgent;

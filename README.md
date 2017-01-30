@@ -35,24 +35,17 @@ The run-scripts used:
 ## Structure
 The directory structure of a typical project:
 
-    ├── LICENSE
-    ├── README.md
-    ├── package.json
-    ├── scripts
-    │   └── remapped-coverage.js
-    ├── src
-    │   ├── calculator
-    │   │   ├── index.ts
-    │   │   └── test.ts
-    │   ├── greeter
-    │   │   ├── index.ts
-    │   │   └── test.ts
+    ├── KiiHelper
+    │   └── KiiHelper.ts
+    ├── model
+    │   ├── App.ts
+    │   ├── EndNode.ts
+    │   ├── Gateway.ts
+    │   ├── User.ts
     │   └── index.ts
-    ├── test
-    │   └── mocha.opts
-    ├── tsconfig.dist.json
-    ├── tsconfig.json
-    └── tslint.json
+    ├── index.ts
+    ├── init.ts
+    └── test.ts
 
 In addition, these directories are auto-created by the various scripts. The coverage & build directories are .gitignored. By design, dist directories are - for pure-Type/JavaScript packages, this is an advantage. If your package included native/compiled artifacts, it might need to be reconsidered.
 
