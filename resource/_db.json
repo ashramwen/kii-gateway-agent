@@ -1,19 +1,19 @@
 {
   "app": {
-    "appID": "appID",
-    "appKey": "appKey",
+    "appID": "a333fe49",
+    "appKey": "ddab3f01d0eda5b73051c660134359fc",
     "site": "https://api-sg.kii.com"
   },
   "user": {
-    "ownerToken": "ownerToken",
-    "userID": "userID"
+    "ownerToken": "h6QKPtb8S2THnUusf6xMCXUv2MWzmRbZY8TVf0_Mzxc",
+    "userID": "7c698b427320-f689-6e11-91ed-00c48d05"
   },
   "gateway": {
     "type": "EnergyGateway",
     "password": "12345",
     "vendorThingID": "3c15c2d23a38",
     "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0e56ca79",
-    "accessToken": "KSMdyaqrpU1pdBv14jmMRWAYOsjQUqIFCQHin7PhiVo",
+    "accessToken": "645Pqby1uxJW1SotTeBGZy54HI6g05521WIDd82JKkM",
     "mqttEndpoint": {
       "installationID": "qhi8z9azgsq3nmm8rjptadunb",
       "username": "a333fe49-IkdBUfnkHo0wSXCzgFBQmHb",
@@ -33,7 +33,7 @@
       "password": "12345",
       "vendorThingID": "Donkey",
       "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0dad41ca",
-      "accessToken": "em9mHHmkmWtnWaBM0wYQ6FZd21Tj2kDgKB0dTszxvPs"
+      "accessToken": "sFW0RQmgLzXVw6_UBkYGn8YqahGEL4cdUbEsWv4sk0I"
     }
   ]
 }

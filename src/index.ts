@@ -42,9 +42,17 @@ class KiiGatewayAgent {
     this.db.set('app', this.kii.app).value();
   }
 
+  setTemporaryApp(_appID: string, _appKey: string, _site: string) {
+    this.kii.setApp(_appID, _appKey, _site);
+  }
+
   setUser(ownerToken: string, ownerID: string) {
     this.kii.setUser(ownerToken, ownerID);
     this.db.set('user', this.kii.user).value();
+  }
+
+  setTemporaryUser(ownerToken: string, ownerID: string) {
+    this.kii.setUser(ownerToken, ownerID);
   }
 
   // onboard gateway by owner
