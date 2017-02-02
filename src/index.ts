@@ -37,25 +37,65 @@ class KiiGatewayAgent {
     this.kii.user = this.db.get('user').value() as User;
   }
 
+  /**
+   * set app
+   *
+   * @param {string} _appID
+   * @param {string} _appKey
+   * @param {string} _site
+   * @memberOf KiiGatewayAgent
+   */
   setApp(_appID: string, _appKey: string, _site: string) {
-    this.kii.setApp(_appID, _appKey, _site);
+    this.setTemporaryApp(_appID, _appKey, _site);
     this.db.set('app', this.kii.app).value();
   }
 
+
+  /**
+   * set app without overwriting the configuration
+   *
+   * @param {string} _appID
+   * @param {string} _appKey
+   * @param {string} _site
+   * @memberOf KiiGatewayAgent
+   */
   setTemporaryApp(_appID: string, _appKey: string, _site: string) {
     this.kii.setApp(_appID, _appKey, _site);
   }
 
+  /**
+   * set user
+   *
+   * @param {string} ownerToken
+   * @param {string} ownerID
+   *
+   * @memberOf KiiGatewayAgent
+   */
   setUser(ownerToken: string, ownerID: string) {
-    this.kii.setUser(ownerToken, ownerID);
+    this.setTemporaryUser(ownerToken, ownerID);
     this.db.set('user', this.kii.user).value();
   }
 
+  /**
+   * set user without overwriting the configuration
+   *
+   * @param {string} ownerToken
+   * @param {string} ownerID
+   *
+   * @memberOf KiiGatewayAgent
+   */
   setTemporaryUser(ownerToken: string, ownerID: string) {
     this.kii.setUser(ownerToken, ownerID);
   }
 
-  // onboard gateway by owner
+  /**
+   * onboard gateway by owner
+   *
+   * @param {any} [properties]
+   * @returns {promise}
+   *
+   * @memberOf KiiGatewayAgent
+   */
   onboardGatewayByOwner(properties?) {
     let deferred = Q.defer()
     this.kii.onboardGatewayByOwner(properties).then((gateway: Gateway) => {
@@ -65,7 +105,15 @@ class KiiGatewayAgent {
     return deferred.promise;
   }
 
-  // onboard endnode with gateway by owner
+  /**
+   * onboard endnode with gateway by owner
+   *
+   * @param {string} endNodeVendorThingID
+   * @param {any} [properties]
+   * @returns {promise}
+   *
+   * @memberOf KiiGatewayAgent
+   */
   onboardEndnodeByOwner(endNodeVendorThingID: string, properties?) {
     let local_endnode = this.detectEndnodeOnboardingStatus(endNodeVendorThingID);
     let deferred = Q.defer();
@@ -81,7 +129,15 @@ class KiiGatewayAgent {
     return deferred.promise;
   }
 
-  // update endnode state
+  /**
+   * update endnode state
+   *
+   * @param {string} endNodeThingID
+   * @param {any} [states]
+   * @returns {promise}
+   *
+   * @memberOf KiiGatewayAgent
+   */
   updateEndnodeState(endNodeThingID: string, states?) {
     let deferred = Q.defer()
     this.kii.updateEndnodeState(endNodeThingID, states).then(
@@ -91,7 +147,15 @@ class KiiGatewayAgent {
     return deferred.promise
   }
 
-  // update endnode connectivity
+  /**
+   * update endnode connectivity
+   *
+   * @param {string} endNodeThingID
+   * @param {boolean} online
+   * @returns {promise}
+   *
+   * @memberOf KiiGatewayAgent
+   */
   updateEndnodeConnectivity(endNodeThingID: string, online: boolean) {
     let deferred = Q.defer()
     this.kii.updateEndnodeConnectivity(endNodeThingID, online).then(
@@ -101,7 +165,14 @@ class KiiGatewayAgent {
     return deferred.promise
   }
 
-  // retrive endnode onboarding status
+  /**
+   * retrieve endnode onboarding status
+   *
+   * @param {string} endNodeVendorThingID
+   * @returns {EndNode}
+   *
+   * @memberOf KiiGatewayAgent
+   */
   detectEndnodeOnboardingStatus(endNodeVendorThingID: string): EndNode {
     return this.db.get('endNodes').find({ vendorThingID: endNodeVendorThingID }).value() as EndNode;
   }

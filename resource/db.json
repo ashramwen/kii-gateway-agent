@@ -13,7 +13,7 @@
     "password": "12345",
     "vendorThingID": "3c15c2d23a38",
     "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0e56ca79",
-    "accessToken": "W_6XE5sIZh4E0nnJq9CZcnrhRlWj0ouqvthVNFggqT8",
+    "accessToken": "IiFSZfJulvChHJNjgz1ZPu2VCxZbhtdlnJA1EQeHG38",
     "mqttEndpoint": {
       "installationID": "qhi8z9azgsq3nmm8rjptadunb",
       "username": "a333fe49-IkdBUfnkHo0wSXCzgFBQmHb",
@@ -33,7 +33,7 @@
       "password": "12345",
       "vendorThingID": "Donkey",
       "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0dad41ca",
-      "accessToken": "5lreumk6PPz4LZ1h8qas5gBGOSffBRyj0JJwTKJbw0Y"
+      "accessToken": "WJHwU9Q5V_U7RxlbSabqFATBqDg4kGww3f66wvOtAAM"
     }
   ]
 }
