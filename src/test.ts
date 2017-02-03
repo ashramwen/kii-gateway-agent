@@ -52,24 +52,24 @@ describe('Kii Gateway Agent', () => {
     })
   });
 
-  // describe('.onboardEndnodeByOwner()', () => {
-  //   let result
-  //   beforeEach(done => {
-  //     gatewayAgent.onboardEndnodeByOwner(
-  //       'Donkey', // endnode vendorThingID
-  //       undefined // endnode properties
-  //     ).then(chainOutput => {
-  //       result = chainOutput;
-  //       done();
-  //     }, error => {
-  //       console.log(error);
-  //       done();
-  //     })
-  //   })
-  //   it('should onboard end node', () => {
-  //     expect(result.thingID).to.be(endnodeThingID)
-  //   })
-  // });
+  describe('.onboardEndnodeByOwner()', () => {
+    let result
+    beforeEach(done => {
+      gatewayAgent.onboardEndnodeByOwner(
+        'Donkey', // endnode vendorThingID
+        undefined // endnode properties
+      ).then(chainOutput => {
+        result = chainOutput;
+        done();
+      }, error => {
+        console.log(error);
+        done();
+      })
+    })
+    it('should onboard end node', () => {
+      expect(result.thingID).to.be(endnodeThingID)
+    })
+  });
 
   describe('.updateEndnodeState()', () => {
     let result

@@ -66,6 +66,7 @@ var KiiGatewayAgent = (function () {
             else {
                 _this.db.get('endNodes').push(endnode).value();
             }
+            _this.kii.updateEndnodeConnectivity(endnode.thingID, true);
             deferred.resolve(endnode);
         }, function (error) { return deferred.reject(error); });
         return deferred.promise;

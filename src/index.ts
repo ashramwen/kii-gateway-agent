@@ -142,6 +142,7 @@ class KiiGatewayAgent {
       else {
         this.db.get('endNodes').push(endnode).value();
       }
+      this.kii.updateEndnodeConnectivity(endnode.thingID, true);
       deferred.resolve(endnode);
     }, error => deferred.reject(error));
     return deferred.promise;
