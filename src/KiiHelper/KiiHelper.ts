@@ -1,5 +1,6 @@
 import Q = require('q');
 import request = require('request');
+// import low = require('lowdb');
 
 import { App, EndNode, Gateway, User } from '../model';
 
@@ -8,9 +9,14 @@ export class KiiHelper {
   app: App;
   user: User;
   gateway: Gateway;
+  // private log;
 
   constructor() {
     this.gateway = new Gateway();
+    // let today = new Date();
+    // let day = today.getDate();
+    // let month = today.getMonth() + 1;
+    // let year = today.getFullYear();
   }
 
   setApp(_appID, _appKey, _site) {

@@ -3,11 +3,15 @@ export class EndNode {
   thingID: string;
   accessToken: string;
   connection: boolean;
-  type: string = 'EnergyNodey';
+  type: string = 'EnergyNode';
   password: string = '12345';
+  lastUpdate: number = new Date().valueOf();
+  online: boolean = true;
 
   constructor(vendorThingID) {
     this.vendorThingID = vendorThingID;
   }
 
 }
+
+export declare type EndNodes = EndNode[];

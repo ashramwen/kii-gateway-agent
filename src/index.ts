@@ -5,15 +5,21 @@ import low = require('lowdb');
 import macaddress = require('macaddress');
 import fs = require('fs');
 
-import { App, EndNode, Gateway, User } from './model/index';
+import { App, EndNode, EndNodes, Gateway, User } from './model/index';
 import { KiiHelper } from './KiiHelper/KiiHelper';
+
+const TIMESPAN = 300000; // 5 mins
 
 class KiiGatewayAgent {
   static preinit() {
-    const dir = './resource';
+    let dir = './resource';
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
+    // dir = './log';
+    // if (!fs.existsSync(dir)) {
+    //   fs.mkdirSync(dir);
+    // }
     let db = new low('./resource/db.json');
     db.defaults({
       app: {
@@ -29,6 +35,8 @@ class KiiGatewayAgent {
 
   kii: KiiHelper;
   db: any;
+  private timer;
+
   constructor() {
     KiiGatewayAgent.preinit();
     this.kii = new KiiHelper();
@@ -49,7 +57,6 @@ class KiiGatewayAgent {
     this.setTemporaryApp(_appID, _appKey, _site);
     this.db.set('app', this.kii.app).value();
   }
-
 
   /**
    * set app without overwriting the configuration
@@ -99,10 +106,21 @@ class KiiGatewayAgent {
   onboardGatewayByOwner(properties?) {
     let deferred = Q.defer()
     this.kii.onboardGatewayByOwner(properties).then((gateway: Gateway) => {
-      this.db.set('gateway', gateway).value()
+      this.db.set('gateway', gateway).value();
       deferred.resolve(gateway);
-    }, error => deferred.reject(new Error(error)))
+    }, error => deferred.reject(error))
     return deferred.promise;
+  }
+
+  /**
+   * return if gateway is onboarding or not (by gateway thingID)
+   *
+   * @returns {boolean}
+   *
+   * @memberOf KiiGatewayAgent
+   */
+  isGatewayOnboarding(): boolean {
+    return !!this.kii.gateway.thingID;
   }
 
   /**
@@ -115,7 +133,7 @@ class KiiGatewayAgent {
    * @memberOf KiiGatewayAgent
    */
   onboardEndnodeByOwner(endNodeVendorThingID: string, properties?) {
-    let local_endnode = this.detectEndnodeOnboardingStatus(endNodeVendorThingID);
+    let local_endnode = this.getEndnode(endNodeVendorThingID);
     let deferred = Q.defer();
     this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties).then((endnode: EndNode) => {
       if (local_endnode) {
@@ -125,30 +143,48 @@ class KiiGatewayAgent {
         this.db.get('endNodes').push(endnode).value();
       }
       deferred.resolve(endnode);
-    }, error => deferred.reject(new Error(error)));
+    }, error => deferred.reject(error));
     return deferred.promise;
   }
 
   /**
    * update endnode state
    *
-   * @param {string} endNodeThingID
+   * @param {string} endNodeVendorThingID
    * @param {any} [states]
    * @returns {promise}
    *
    * @memberOf KiiGatewayAgent
    */
-  updateEndnodeState(endNodeThingID: string, states?) {
-    let deferred = Q.defer()
-    this.kii.updateEndnodeState(endNodeThingID, states).then(
-      res => deferred.resolve(res),
-      error => deferred.reject(new Error(error))
-    );
-    return deferred.promise
+  updateEndnodeState(endNodeVendorThingID: string, states?) {
+    let deferred = Q.defer();
+
+    let endnode = this.getEndnode(endNodeVendorThingID);
+    endnode.lastUpdate = new Date().valueOf();
+    if (endnode.online) {
+      this.kii.updateEndnodeState(endnode.thingID, states).then(
+        res => deferred.resolve(res),
+        error => deferred.reject(error)
+      );
+    } else {
+      endnode.online = true;
+      this.updateEndnodeConnectivityByThingID(endnode.thingID, true).then(
+        (res) => {
+          this.kii.updateEndnodeState(endnode.thingID, states).then(
+            res => deferred.resolve(res),
+            error => deferred.reject(error)
+          );
+        },
+        (error) => { deferred.reject(error) }
+      );
+    }
+
+    this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+    return deferred.promise;
   }
 
   /**
-   * update endnode connectivity
+   * update endnode connectivity by thingID
    *
    * @param {string} endNodeThingID
    * @param {boolean} online
@@ -156,25 +192,93 @@ class KiiGatewayAgent {
    *
    * @memberOf KiiGatewayAgent
    */
-  updateEndnodeConnectivity(endNodeThingID: string, online: boolean) {
-    let deferred = Q.defer()
+  updateEndnodeConnectivityByThingID(endNodeThingID: string, online: boolean) {
+    let deferred = Q.defer();
     this.kii.updateEndnodeConnectivity(endNodeThingID, online).then(
       res => deferred.resolve(res),
-      error => deferred.reject(new Error(error))
+      error => deferred.reject(error)
     );
     return deferred.promise
+  }
+
+  /**
+   * update endnode connectivity by vendorThingID
+   *
+   * @param {string} endNodeVendorThingID
+   * @param {boolean} online
+   * @returns {promise}
+   *
+   * @memberOf KiiGatewayAgent
+   */
+  updateEndnodeConnectivityByVendorThingID(endNodeVendorThingID: string, online: boolean) {
+    let node = this.getEndnode(endNodeVendorThingID);
+    let deferred = Q.defer();
+    if (node) {
+      this.updateEndnodeConnectivityByThingID(node.thingID, online).then(
+        res => deferred.resolve(res),
+        error => deferred.reject(error)
+      );
+    } else {
+      deferred.reject(new Error('endnode not found.'));
+    }
+    return deferred.promise;
   }
 
   /**
    * retrieve endnode onboarding status
    *
    * @param {string} endNodeVendorThingID
-   * @returns {EndNode}
+   * @returns {promise}
    *
    * @memberOf KiiGatewayAgent
    */
-  detectEndnodeOnboardingStatus(endNodeVendorThingID: string): EndNode {
+  getEndnode(endNodeVendorThingID: string): EndNode {
     return this.db.get('endNodes').find({ vendorThingID: endNodeVendorThingID }).value() as EndNode;
+  }
+
+  /**
+   * update endnode connectivity
+   *
+   * @returns {EndNode}
+   * @memberOf KiiGatewayAgent
+   */
+  updateEndnodeOnline() {
+    let deferred = Q.defer();
+    let promises = [];
+    let endnodes = this.db.get('endNodes').value() as EndNodes;
+    let now = new Date().valueOf();
+    for (let endnode of endnodes) {
+      if (!endnode.online) continue;
+      if (now - endnode.lastUpdate < TIMESPAN) continue;
+      let promise = this.updateEndnodeConnectivityByThingID(endnode.thingID, false);
+      promise.then(res => {
+        endnode.online = false;
+        this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).value();
+      }, err => console.log(err));
+      promises.push(promise);
+    }
+    Q.allSettled(promises).then(results => {
+      deferred.resolve(results);
+    });
+    return deferred.promise
+  }
+
+  /**
+   * activate endnode connectivity detecting
+   *
+   * @param {boolean} active
+   *
+   * @memberOf KiiGatewayAgent
+   */
+  activateEndnodeOnlineDetecting(active: boolean) {
+    if (active) {
+      if (this.timer) return;
+      this.timer = setTimeout(() => { this.updateEndnodeOnline(); }, TIMESPAN);
+    } else {
+      if (!this.timer) return;
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
   }
 
   // mqtt

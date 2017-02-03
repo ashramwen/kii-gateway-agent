@@ -5,5 +5,8 @@ export declare class EndNode {
     connection: boolean;
     type: string;
     password: string;
+    lastUpdate: number;
+    online: boolean;
     constructor(vendorThingID: any);
 }
+export declare type EndNodes = EndNode[];

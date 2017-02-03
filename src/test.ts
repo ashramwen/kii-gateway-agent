@@ -52,30 +52,30 @@ describe('Kii Gateway Agent', () => {
     })
   });
 
-  describe('.onboardEndnodeByOwner()', () => {
-    let result
-    beforeEach(done => {
-      gatewayAgent.onboardEndnodeByOwner(
-        'Donkey', // endnode vendorThingID
-        undefined // endnode properties
-      ).then(chainOutput => {
-        result = chainOutput;
-        done();
-      }, error => {
-        console.log(error);
-        done();
-      })
-    })
-    it('should onboard end node', () => {
-      expect(result.thingID).to.be(endnodeThingID)
-    })
-  });
+  // describe('.onboardEndnodeByOwner()', () => {
+  //   let result
+  //   beforeEach(done => {
+  //     gatewayAgent.onboardEndnodeByOwner(
+  //       'Donkey', // endnode vendorThingID
+  //       undefined // endnode properties
+  //     ).then(chainOutput => {
+  //       result = chainOutput;
+  //       done();
+  //     }, error => {
+  //       console.log(error);
+  //       done();
+  //     })
+  //   })
+  //   it('should onboard end node', () => {
+  //     expect(result.thingID).to.be(endnodeThingID)
+  //   })
+  // });
 
   describe('.updateEndnodeState()', () => {
     let result
     beforeEach(done => {
       gatewayAgent.updateEndnodeState(
-        endnodeThingID, // endnode thingID
+        'Donkey', // endnode vendorThingID
         {
           'batteryAlias': {
             'power': true
@@ -97,31 +97,31 @@ describe('Kii Gateway Agent', () => {
     })
   });
 
-  describe('.updateEndnodeConnectivity()', () => {
-    let result
-    beforeEach(done => {
-      gatewayAgent.updateEndnodeConnectivity(
-        endnodeThingID, // endnode thingID
-        true //online
-      ).then(chainOutput => {
-        result = chainOutput
-        done()
-      }, error => {
-        console.log(error);
-        done();
-      })
-    })
-    it('should update endnode connection status', () => {
-      expect(result).to.be(204);
-    })
-  });
+  // describe('.updateEndnodeConnectivityBythingID()', () => {
+  //   let result
+  //   beforeEach(done => {
+  //     gatewayAgent.updateEndnodeConnectivityBythingID(
+  //       endnodeThingID, // endnode thingID
+  //       true //online
+  //     ).then(chainOutput => {
+  //       result = chainOutput
+  //       done();
+  //     }, error => {
+  //       console.log(error);
+  //       done();
+  //     })
+  //   })
+  //   it('should update endnode connection status', () => {
+  //     expect(result).to.be(204);
+  //   })
+  // });
 
   describe('.detectEndnodeOnboardingStatus()', () => {
     let donkey;
     let notExistingDonkey;
     beforeEach(done => {
-      donkey = gatewayAgent.detectEndnodeOnboardingStatus('Donkey');
-      notExistingDonkey = gatewayAgent.detectEndnodeOnboardingStatus('notExistingDonkey');
+      donkey = gatewayAgent.getEndnode('Donkey');
+      notExistingDonkey = gatewayAgent.getEndnode('notExistingDonkey');
       done();
     })
     it('should return if endnode is onboarding or not', () => {
@@ -129,4 +129,19 @@ describe('Kii Gateway Agent', () => {
       expect(notExistingDonkey).to.be(undefined)
     })
   });
+
+  // describe('.updateEndnodeOnline()', () => {
+  //   beforeEach(done => {
+  //     gatewayAgent.updateEndnodeOnline()
+  //       .then(chainOutput => {
+  //         done();
+  //       }, error => {
+  //         console.log(error);
+  //         done();
+  //       })
+  //   })
+  //   it('should update local endnode connectivity', done => {
+  //     done();
+  //   })
+  // });
 })
