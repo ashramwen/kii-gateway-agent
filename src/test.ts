@@ -15,7 +15,7 @@ const ownerToken = 'h6QKPtb8S2THnUusf6xMCXUv2MWzmRbZY8TVf0_Mzxc';
 const ownerID = '7c698b427320-f689-6e11-91ed-00c48d05';
 
 const gatewayThingID = 'th.ba28b2d34b60-3deb-6e11-412e-0e56ca79';
-const endnodeThingID = 'th.ba28b2d34b60-3deb-6e11-412e-0dad41ca';
+const endnodeThingID = 'th.ba28b2d34b60-18ab-6e11-4ece-0a86ebba';
 
 describe('Kii Gateway Agent', () => {
   let gatewayAgent = new KiiGatewayAgent();
