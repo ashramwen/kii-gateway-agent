@@ -87,6 +87,7 @@ export class KiiHelper {
     };
 
     request(options, (error, response, body) => {
+      this.gc();
       if (error) deferred.reject(new Error(error));
       body = JSON.parse(body);
       endnode.thingID = body.endNodeThingID;
@@ -110,9 +111,7 @@ export class KiiHelper {
       body: JSON.stringify(states)
     };
     request(options, (error, response, body) => {
-      if (global.gc) {
-        global.gc();
-      }
+      this.gc();
       if (response && response.statusCode === 204) {
         deferred.resolve(response.statusCode);
       }
@@ -139,9 +138,7 @@ export class KiiHelper {
       })
     };
     request(options, (error, response, body) => {
-      if (global.gc) {
-        global.gc();
-      }
+      this.gc();
       if (response && response.statusCode === 204) {
         deferred.resolve(response.statusCode);
       }
@@ -151,5 +148,11 @@ export class KiiHelper {
       deferred.reject(body);
     });
     return deferred.promise;
+  }
+
+  private gc() {
+    if (global.gc) {
+      global.gc();
+    }
   }
 }

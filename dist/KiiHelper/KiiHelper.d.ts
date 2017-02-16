@@ -12,4 +12,5 @@ export declare class KiiHelper {
     onboardEndnodeByOwner(endNodeVendorThingID: any, properties?: any): Q.Promise<{}>;
     updateEndnodeState(endNodeThingID: any, states: any): Q.Promise<{}>;
     updateEndnodeConnectivity(endNodeThingID: string, online: boolean): Q.Promise<{}>;
+    private gc();
 }

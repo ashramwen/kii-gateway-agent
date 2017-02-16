@@ -45,6 +45,7 @@ var KiiHelper = (function () {
         return deferred.promise;
     };
     KiiHelper.prototype.onboardEndnodeByOwner = function (endNodeVendorThingID, properties) {
+        var _this = this;
         var endnode = new model_1.EndNode(endNodeVendorThingID);
         var body = {
             'endNodeVendorThingID': endnode.vendorThingID,
@@ -66,6 +67,7 @@ var KiiHelper = (function () {
             body: JSON.stringify(body)
         };
         request(options, function (error, response, body) {
+            _this.gc();
             if (error)
                 deferred.reject(new Error(error));
             body = JSON.parse(body);
@@ -76,6 +78,7 @@ var KiiHelper = (function () {
         return deferred.promise;
     };
     KiiHelper.prototype.updateEndnodeState = function (endNodeThingID, states) {
+        var _this = this;
         var deferred = Q.defer();
         var options = {
             method: 'PUT',
@@ -87,9 +90,7 @@ var KiiHelper = (function () {
             body: JSON.stringify(states)
         };
         request(options, function (error, response, body) {
-            if (global.gc) {
-                global.gc();
-            }
+            _this.gc();
             if (response && response.statusCode === 204) {
                 deferred.resolve(response.statusCode);
             }
@@ -102,6 +103,7 @@ var KiiHelper = (function () {
         return deferred.promise;
     };
     KiiHelper.prototype.updateEndnodeConnectivity = function (endNodeThingID, online) {
+        var _this = this;
         var deferred = Q.defer();
         var options = {
             method: 'PUT',
@@ -115,9 +117,7 @@ var KiiHelper = (function () {
             })
         };
         request(options, function (error, response, body) {
-            if (global.gc) {
-                global.gc();
-            }
+            _this.gc();
             if (response && response.statusCode === 204) {
                 deferred.resolve(response.statusCode);
             }
@@ -128,6 +128,11 @@ var KiiHelper = (function () {
             deferred.reject(body);
         });
         return deferred.promise;
+    };
+    KiiHelper.prototype.gc = function () {
+        if (global.gc) {
+            global.gc();
+        }
     };
     return KiiHelper;
 }());
