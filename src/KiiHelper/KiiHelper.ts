@@ -1,3 +1,5 @@
+/// <reference types='node' />
+
 import Q = require('q');
 import request = require('request');
 // import low = require('lowdb');
@@ -108,9 +110,16 @@ export class KiiHelper {
       body: JSON.stringify(states)
     };
     request(options, (error, response, body) => {
-      if (error) deferred.reject(new Error(error));
-      if (response.statusCode !== 204) deferred.reject(body);
-      deferred.resolve(response.statusCode);
+      if (global.gc) {
+        global.gc();
+      }
+      if (response && response.statusCode === 204) {
+        deferred.resolve(response.statusCode);
+      }
+      if (error) {
+        deferred.reject(new Error(error));
+      };
+      deferred.reject(body);
     });
     return deferred.promise;
   }
@@ -130,9 +139,16 @@ export class KiiHelper {
       })
     };
     request(options, (error, response, body) => {
-      if (error) deferred.reject(new Error(error));
-      if (response.statusCode !== 204) deferred.reject(body);
-      deferred.resolve(response.statusCode);
+      if (global.gc) {
+        global.gc();
+      }
+      if (response && response.statusCode === 204) {
+        deferred.resolve(response.statusCode);
+      }
+      if (error) {
+        deferred.reject(new Error(error));
+      };
+      deferred.reject(body);
     });
     return deferred.promise;
   }

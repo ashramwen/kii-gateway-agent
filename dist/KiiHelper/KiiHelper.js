@@ -87,11 +87,17 @@ var KiiHelper = (function () {
             body: JSON.stringify(states)
         };
         request(options, function (error, response, body) {
-            if (error)
+            if (global.gc) {
+                global.gc();
+            }
+            if (response && response.statusCode === 204) {
+                deferred.resolve(response.statusCode);
+            }
+            if (error) {
                 deferred.reject(new Error(error));
-            if (response.statusCode !== 204)
-                deferred.reject(body);
-            deferred.resolve(response.statusCode);
+            }
+            ;
+            deferred.reject(body);
         });
         return deferred.promise;
     };
@@ -109,11 +115,17 @@ var KiiHelper = (function () {
             })
         };
         request(options, function (error, response, body) {
-            if (error)
+            if (global.gc) {
+                global.gc();
+            }
+            if (response && response.statusCode === 204) {
+                deferred.resolve(response.statusCode);
+            }
+            if (error) {
                 deferred.reject(new Error(error));
-            if (response.statusCode !== 204)
-                deferred.reject(body);
-            deferred.resolve(response.statusCode);
+            }
+            ;
+            deferred.reject(body);
         });
         return deferred.promise;
     };
