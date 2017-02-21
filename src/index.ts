@@ -6,7 +6,7 @@ import macaddress = require('macaddress');
 import fs = require('fs');
 
 import { App, EndNode, EndNodes, Gateway, User } from './model/index';
-import { KiiHelper } from './KiiHelper/KiiHelper';
+import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/index';
 
 const TIMESPAN = 300000; // 5 mins
 
@@ -22,7 +22,7 @@ class KiiGatewayAgent {
     // }
     let db = new low('./resource/db.json');
     db.defaults({
-      requestTimes: 10,
+      // requestTimes: 10,
       app: {
         'appID': 'appID',
         'appKey': 'appKey',
@@ -34,7 +34,7 @@ class KiiGatewayAgent {
     }).value();
   }
 
-  kii: KiiHelper;
+  kii: KiiBase;
   db: any;
   private timer;
 
@@ -44,7 +44,7 @@ class KiiGatewayAgent {
     this.db = new low('./resource/db.json');
     this.kii.app = this.db.get('app').value() as App;
     this.kii.user = this.db.get('user').value() as User;
-    this.kii.setCounter(this.db.get('requestTimes').value() as number);
+    // this.kii.setCounter(this.db.get('requestTimes').value() as number);
   }
 
   /**

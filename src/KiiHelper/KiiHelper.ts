@@ -4,31 +4,17 @@ import Q = require('q');
 import request = require('request');
 // import low = require('lowdb');
 
+import { KiiBase} from './KiiBase';
 import { App, EndNode, Gateway, User } from '../model';
 
-export class KiiHelper {
+export class KiiHelper extends KiiBase {
 
   private maxRequest: number = 10;
   private counter: number = 0;
-  app: App;
-  user: User;
-  gateway: Gateway;
   // private log;
 
   constructor() {
-    this.gateway = new Gateway();
-    // let today = new Date();
-    // let day = today.getDate();
-    // let month = today.getMonth() + 1;
-    // let year = today.getFullYear();
-  }
-
-  setApp(_appID, _appKey, _site) {
-    this.app = new App(_appID, _appKey, _site);
-  }
-
-  setUser(ownerToken, ownerID) {
-    this.user = new User(ownerToken, ownerID);
+    super();
   }
 
   // onboard gateway by owner
@@ -150,16 +136,6 @@ export class KiiHelper {
       deferred.reject(body);
     });
     return deferred.promise;
-  }
-
-  setCounter(times) {
-    try {
-      if (times <= 0) return;
-      this.maxRequest = times;
-    }
-    catch (err) {
-      console.log('requestTimes error:', times);
-    }
   }
 
   private gcByCounter() {
