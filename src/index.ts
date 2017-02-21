@@ -22,6 +22,7 @@ class KiiGatewayAgent {
     // }
     let db = new low('./resource/db.json');
     db.defaults({
+      requestTimes: 10,
       app: {
         'appID': 'appID',
         'appKey': 'appKey',
@@ -43,6 +44,7 @@ class KiiGatewayAgent {
     this.db = new low('./resource/db.json');
     this.kii.app = this.db.get('app').value() as App;
     this.kii.user = this.db.get('user').value() as User;
+    this.kii.setCounter(this.db.get('requestTimes').value() as number);
   }
 
   /**

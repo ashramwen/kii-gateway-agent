@@ -8,6 +8,8 @@ import { App, EndNode, Gateway, User } from '../model';
 
 export class KiiHelper {
 
+  private maxRequest: number = 10;
+  private counter: number = 0;
   app: App;
   user: User;
   gateway: Gateway;
@@ -150,8 +152,27 @@ export class KiiHelper {
     return deferred.promise;
   }
 
+  setCounter(times) {
+    try {
+      if (times <= 0) return;
+      this.maxRequest = times;
+    }
+    catch (err) {
+      console.log('requestTimes error:', times);
+    }
+  }
+
+  private gcByCounter() {
+    if (!global.gc) return;
+    if (this.counter < this.maxRequest) return;
+    this.counter = 0;
+    // console.log('gc.');
+    global.gc();
+  }
+
   private gc() {
     if (global.gc) {
+      // console.log('gc.');
       global.gc();
     }
   }
