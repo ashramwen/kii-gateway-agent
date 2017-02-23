@@ -1,21 +1,21 @@
-global.WebSocket = require('ws')
+global['WebSocket'] = require('ws')
 
-global.localStorage = {
+global['localStorage'] = {
   store: {},
   getItem: function (key) {
-    return this.store[key]
+    return this.store[key];
   },
   setItem: function (key, value) {
-    this.store[key] = value
+    this.store[key] = value;
   },
   removeItem: function (key) {
-    delete this.store[key]
+    delete this.store[key];
   }
 }
-global.window = global
+global['window'] = global;
 
-const Paho = {}
-module.exports = Paho
+const Paho = {};
+module.exports = Paho;
 
 /*******************************************************************************
  * Copyright (c) 2013 IBM Corp.

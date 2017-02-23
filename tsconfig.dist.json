@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
+        "allowJs": true,
+        "allowUnreachableCode": true,
         "module": "commonjs",
         "target": "es5",
-        "declaration": true,
+        // "declaration": true,
         "noImplicitAny": false,
         "sourceMap": false,
         "rootDir": "./src",
@@ -10,6 +12,9 @@
         "outDir": "./dist"
     },
     "exclude": [
+        "build",
+        "dist",
+        "scripts",
         "node_modules",
         "./src/**/*test.ts",
         "./src/**/test/*"

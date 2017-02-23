@@ -1,12 +1,12 @@
 /// <reference types='node' />
 /// <reference types='lowdb' />
+import { App, EndNode, EndNodes, Gateway, User, Mode } from './model/index';
+import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/index';
+
 import Q = require('q');
 import low = require('lowdb');
 import macaddress = require('macaddress');
 import fs = require('fs');
-
-import { App, EndNode, EndNodes, Gateway, User } from './model/index';
-import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/index';
 
 const TIMESPAN = 300000; // 5 mins
 
@@ -38,9 +38,12 @@ class KiiGatewayAgent {
   db: any;
   private timer;
 
-  constructor() {
+  constructor(mode: Mode) {
     KiiGatewayAgent.preinit();
-    this.kii = new KiiHelper();
+    if (mode === Mode.Http)
+      this.kii = new KiiHelper();
+    else
+      this.kii = new KiiMqttHelper();
     this.db = new low('./resource/db.json');
     this.kii.app = this.db.get('app').value() as App;
     this.kii.user = this.db.get('user').value() as User;
@@ -165,7 +168,7 @@ class KiiGatewayAgent {
     let endnode = this.getEndnode(endNodeVendorThingID);
     endnode.lastUpdate = new Date().valueOf();
     if (endnode.online) {
-      this.kii.updateEndnodeState(endnode.thingID, states).then(
+      this.kii.updateEndnodeState(endnode, states).then(
         res => deferred.resolve(res),
         error => deferred.reject(error)
       );
@@ -173,7 +176,7 @@ class KiiGatewayAgent {
       endnode.online = true;
       this.updateEndnodeConnectivityByThingID(endnode.thingID, true).then(
         (res) => {
-          this.kii.updateEndnodeState(endnode.thingID, states).then(
+          this.kii.updateEndnodeState(endnode, states).then(
             res => deferred.resolve(res),
             error => deferred.reject(error)
           );

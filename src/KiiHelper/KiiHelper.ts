@@ -4,8 +4,8 @@ import Q = require('q');
 import request = require('request');
 // import low = require('lowdb');
 
-import { KiiBase} from './KiiBase';
-import { App, EndNode, Gateway, User } from '../model';
+import { KiiBase } from './KiiBase';
+import { App, EndNode, EndNodeBody, Gateway, User } from '../model';
 
 export class KiiHelper extends KiiBase {
 
@@ -15,53 +15,20 @@ export class KiiHelper extends KiiBase {
 
   constructor() {
     super();
-  }
-
-  // onboard gateway by owner
-  onboardGatewayByOwner(properties?) {
-    let body = {
-      'vendorThingID': this.gateway.vendorThingID,
-      'thingPassword': this.gateway.password,
-      'thingType': this.gateway.type,
-      'owner': `USER:${this.user.userID}`,
-      'layoutPosition': 'GATEWAY'
-    };
-    if (properties) body['thingProperties'] = properties;
-
-    let deferred = Q.defer();
-    let options = {
-      method: 'POST',
-      url: `${this.app.site}/thing-if/apps/${this.app.appID}/onboardings`,
-      headers: {
-        authorization: `Bearer ${this.user.ownerToken}`,
-        'content-type': 'application/vnd.kii.onboardingWithVendorThingIDByOwner+json'
-      },
-      body: JSON.stringify(body)
-    };
-
-    request(options, (error, response, body) => {
-      if (error) deferred.reject(new Error(error));
-      body = JSON.parse(body);
-      this.gateway.thingID = body.thingID;
-      this.gateway.accessToken = body.accessToken;
-      this.gateway.mqttEndpoint = body.mqttEndpoint;
-      deferred.resolve(this.gateway);
-    });
-
-    return deferred.promise;
+    console.log('running in Http mode.');
   }
 
   // onboard endnode with gateway by owner
   onboardEndnodeByOwner(endNodeVendorThingID, properties?) {
     let endnode = new EndNode(endNodeVendorThingID);
-    let body = {
-      'endNodeVendorThingID': endnode.vendorThingID,
-      'endNodePassword': endnode.password,
-      'gatewayThingID': this.gateway.thingID,
-      'endNodeThingType': endnode.type,
-      'owner': `USER:${this.user.userID}`
+    let body: EndNodeBody = {
+      endNodeVendorThingID: endnode.vendorThingID,
+      endNodePassword: endnode.password,
+      gatewayThingID: this.gateway.thingID,
+      endNodeThingType: endnode.type,
+      owner: `USER:${this.user.userID}`
     };
-    if (properties) body['endNodeThingProperties'] = properties;
+    if (properties) body.endNodeThingProperties = properties;
 
     let deferred = Q.defer();
     let options = {
@@ -87,11 +54,11 @@ export class KiiHelper extends KiiBase {
   }
 
   // update endnode state
-  updateEndnodeState(endNodeThingID, states) {
+  updateEndnodeState(endnode, states) {
     let deferred = Q.defer();
     let options = {
       method: 'PUT',
-      url: this.app.site + `/thing-if/apps/${this.app.appID}/targets/thing:${endNodeThingID}/states`,
+      url: this.app.site + `/thing-if/apps/${this.app.appID}/targets/thing:${endnode.thingID}/states`,
       headers: {
         authorization: `Bearer ${this.user.ownerToken}`,
         'content-type': 'application/json'

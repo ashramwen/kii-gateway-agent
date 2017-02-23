@@ -45,7 +45,7 @@ export abstract class KiiBase {
    *
    * @memberOf KiiBase
    */
-  setApp(_appID, _appKey, _site) {
+  setApp(_appID: string, _appKey: string, _site: string) {
     this.app = new App(_appID, _appKey, _site);
   }
 
@@ -57,7 +57,7 @@ export abstract class KiiBase {
    *
    * @memberOf KiiBase
    */
-  setUser(ownerToken, ownerID) {
+  setUser(ownerToken: string, ownerID: string) {
     this.user = new User(ownerToken, ownerID);
   }
 
@@ -84,7 +84,38 @@ export abstract class KiiBase {
    *
    * @memberOf KiiBase
    */
-  abstract onboardGatewayByOwner(properties?);
+  onboardGatewayByOwner(properties?: Object) {
+    let body = {
+      'vendorThingID': this.gateway.vendorThingID,
+      'thingPassword': this.gateway.password,
+      'thingType': this.gateway.type,
+      'owner': `USER:${this.user.userID}`,
+      'layoutPosition': 'GATEWAY'
+    };
+    if (properties) body['thingProperties'] = properties;
+
+    let deferred = Q.defer();
+    let options = {
+      method: 'POST',
+      url: `${this.app.site}/thing-if/apps/${this.app.appID}/onboardings`,
+      headers: {
+        authorization: `Bearer ${this.user.ownerToken}`,
+        'content-type': 'application/vnd.kii.onboardingWithVendorThingIDByOwner+json'
+      },
+      body: JSON.stringify(body)
+    };
+
+    request(options, (error, response, body) => {
+      if (error) deferred.reject(new Error(error));
+      body = JSON.parse(body);
+      this.gateway.thingID = body.thingID;
+      this.gateway.accessToken = body.accessToken;
+      this.gateway.mqttEndpoint = body.mqttEndpoint;
+      deferred.resolve(this.gateway);
+    });
+
+    return deferred.promise;
+  }
 
 
   /**
@@ -96,7 +127,7 @@ export abstract class KiiBase {
    *
    * @memberOf KiiBase
    */
-  abstract onboardEndnodeByOwner(endNodeVendorThingID, properties?);
+  abstract onboardEndnodeByOwner(endNodeVendorThingID: string, properties?: Object);
 
 
   /**
@@ -108,7 +139,7 @@ export abstract class KiiBase {
    *
    * @memberOf KiiBase
    */
-  abstract updateEndnodeState(endNodeThingID, states);
+  abstract updateEndnodeState(endNode: EndNode, states: Object);
 
 
   /**
@@ -121,14 +152,4 @@ export abstract class KiiBase {
    * @memberOf KiiBase
    */
   abstract updateEndnodeConnectivity(endNodeThingID: string, online: boolean);
-
-  /**
-   * set times of max request
-   *
-   * @abstract
-   * @param {number} times
-   *
-   * @memberOf KiiBase
-   */
-  abstract setCounter(times: number);
 }

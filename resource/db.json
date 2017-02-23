@@ -12,13 +12,13 @@
     "type": "EnergyGateway",
     "password": "12345",
     "vendorThingID": "3c15c2d23a38",
-    "thingID": "th.ba28b2d34b60-3deb-6e11-412e-0e56ca79",
-    "accessToken": "ZMwl4Z_lontW188opQiXbmrG2jtuEkxLPqBEP9XBNHs",
+    "thingID": "th.ba28b2d34b60-8e0a-6e11-8a8f-06579ddf",
+    "accessToken": "VCzOYsuFKwaRRKics0XVq-XTP_b1iEgbOLve8LIK_rk",
     "mqttEndpoint": {
-      "installationID": "qhi8z9azgsq3nmm8rjptadunb",
-      "username": "a333fe49-IkdBUfnkHo0wSXCzgFBQmHb",
-      "password": "GmUytBXwkkLtYijIcrWpdFsVXdBqRwdkMziqNrmidwrHOUUEnFlpFJmUWapBFJPu",
-      "mqttTopic": "ZwxbR4FYaOAlpeVAcf3fZ4j",
+      "installationID": "2637iuf8ya2wlsucnr1pfuvu6",
+      "username": "a333fe49-TpFwgiPNmPfVEwu5qu415vB",
+      "password": "KpblIyuLSrSgmUVFUZAtDVKFaHWDqISYIaXlTjmxFwyPoZBoWfklzpYzXnCdhEli",
+      "mqttTopic": "5gTqubFLXYkoGQBwv99AaWs",
       "host": "sg-mqtt-6093d347b79e.kii.com",
       "portTCP": 1883,
       "portSSL": 8883,
@@ -32,10 +32,19 @@
       "type": "EnergyNode",
       "password": "12345",
       "vendorThingID": "Donkey",
-      "thingID": "th.ba28b2d34b60-18ab-6e11-4ece-0a86ebba",
-      "accessToken": "NQlJDYkBjOLdCzAabJ9lhvaSR-L_MQ_NwbAc3ZSf1ls",
-      "lastUpdate": 1487234998106,
-      "online": true
+      "lastUpdate": 1487830509770,
+      "online": true,
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-9a8f-0c795266",
+      "accessToken": "Fe4navJeRDYMxlN3Kg6bnITywEGoMdU8xbAh_T5YqCY"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487759119906,
+      "online": true,
+      "vendorThingID": "Donkey1",
+      "thingID": "th.7c698b427320-587b-6e11-0b8f-042e3e99",
+      "accessToken": "8tQO-zoE4ErAU5Tz21892wWB1yUFH6nVSo1VB7b38Dw"
     }
   ]
 }

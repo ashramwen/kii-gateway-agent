@@ -35,7 +35,6 @@
     "build": [
       "check-engines",
       "clean",
-      "lint",
       "compile:build",
       "test"
     ],
@@ -46,19 +45,16 @@
     "build:dist": [
       "check-engines",
       "clean:dist",
-      "lint",
       "compile:dist",
       "test:dist"
     ],
     "test:dist": [
       "check-engines",
-      "test-without-cover",
-      "remap-coverage:dist"
+      "test-without-cover"
     ],
     "test": [
       "check-engines",
-      "test-without-cover",
-      "remap-coverage"
+      "test-without-cover"
     ]
   },
   "pre-commit": [
@@ -120,7 +116,8 @@
     "lowdb": "^0.14.0",
     "macaddress": "^0.2.8",
     "q": "^1.4.1",
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "ws": "^1.1.1"
   },
   "standard": {
     "env": [
