@@ -1,13 +1,17 @@
 "use strict";
+var index_1 = require("./KiiHelper/index");
 var Q = require("q");
 var low = require("lowdb");
 var fs = require("fs");
-var KiiHelper_1 = require("./KiiHelper/KiiHelper");
 var TIMESPAN = 300000;
 var KiiGatewayAgent = (function () {
     function KiiGatewayAgent() {
         KiiGatewayAgent.preinit();
-        this.kii = new KiiHelper_1.KiiHelper();
+        if (process.argv.indexOf('--mqtt') < 0)
+            this.kii = new index_1.KiiHelper();
+        else {
+            this.kii = new index_1.KiiMqttHelper();
+        }
         this.db = new low('./resource/db.json');
         this.kii.app = this.db.get('app').value();
         this.kii.user = this.db.get('user').value();
@@ -59,16 +63,22 @@ var KiiGatewayAgent = (function () {
         var _this = this;
         var local_endnode = this.getEndnode(endNodeVendorThingID);
         var deferred = Q.defer();
-        this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties).then(function (endnode) {
-            if (local_endnode) {
-                _this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
-            }
-            else {
-                _this.db.get('endNodes').push(endnode).value();
-            }
-            _this.kii.updateEndnodeConnectivity(endnode.thingID, true);
-            deferred.resolve(endnode);
-        }, function (error) { return deferred.reject(error); });
+        var p = this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties);
+        if (p) {
+            p.then(function (endnode) {
+                if (local_endnode) {
+                    _this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+                }
+                else {
+                    _this.db.get('endNodes').push(endnode).value();
+                }
+                _this.kii.updateEndnodeConnection(endnode, true);
+                deferred.resolve(endnode);
+            }, function (error) { return deferred.reject(error); });
+        }
+        else {
+            deferred.resolve();
+        }
         return deferred.promise;
     };
     KiiGatewayAgent.prototype.updateEndnodeState = function (endNodeVendorThingID, states) {
@@ -77,27 +87,22 @@ var KiiGatewayAgent = (function () {
         var endnode = this.getEndnode(endNodeVendorThingID);
         endnode.lastUpdate = new Date().valueOf();
         if (endnode.online) {
-            this.kii.updateEndnodeState(endnode.thingID, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
+            this.kii.updateEndnodeState(endnode, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
         }
         else {
             endnode.online = true;
-            this.updateEndnodeConnectivityByThingID(endnode.thingID, true).then(function (res) {
-                _this.kii.updateEndnodeState(endnode.thingID, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
+            this.kii.updateEndnodeState(endnode, true).then(function (res) {
+                _this.kii.updateEndnodeState(endnode, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
             }, function (error) { deferred.reject(error); });
         }
         this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
-        return deferred.promise;
-    };
-    KiiGatewayAgent.prototype.updateEndnodeConnectivityByThingID = function (endNodeThingID, online) {
-        var deferred = Q.defer();
-        this.kii.updateEndnodeConnectivity(endNodeThingID, online).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
         return deferred.promise;
     };
     KiiGatewayAgent.prototype.updateEndnodeConnectivityByVendorThingID = function (endNodeVendorThingID, online) {
         var node = this.getEndnode(endNodeVendorThingID);
         var deferred = Q.defer();
         if (node) {
-            this.updateEndnodeConnectivityByThingID(node.thingID, online).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
+            this.kii.updateEndnodeConnection(node, online).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
         }
         else {
             deferred.reject(new Error('endnode not found.'));
@@ -118,7 +123,7 @@ var KiiGatewayAgent = (function () {
                 return "continue";
             if (now - endnode.lastUpdate < TIMESPAN)
                 return "continue";
-            var promise = this_1.updateEndnodeConnectivityByThingID(endnode.thingID, false);
+            var promise = this_1.kii.updateEndnodeConnection(endnode, false);
             promise.then(function (res) {
                 endnode.online = false;
                 _this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).value();

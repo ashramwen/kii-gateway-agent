@@ -1,61 +1,34 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Q = require("q");
 var request = require("request");
+var KiiBase_1 = require("./KiiBase");
 var model_1 = require("../model");
-var KiiHelper = (function () {
+var KiiHelper = (function (_super) {
+    __extends(KiiHelper, _super);
     function KiiHelper() {
-        this.gateway = new model_1.Gateway();
+        var _this = _super.call(this) || this;
+        _this.maxRequest = 10;
+        _this.counter = 0;
+        console.log('running in Http mode.');
+        return _this;
     }
-    KiiHelper.prototype.setApp = function (_appID, _appKey, _site) {
-        this.app = new model_1.App(_appID, _appKey, _site);
-    };
-    KiiHelper.prototype.setUser = function (ownerToken, ownerID) {
-        this.user = new model_1.User(ownerToken, ownerID);
-    };
-    KiiHelper.prototype.onboardGatewayByOwner = function (properties) {
-        var _this = this;
-        var body = {
-            'vendorThingID': this.gateway.vendorThingID,
-            'thingPassword': this.gateway.password,
-            'thingType': this.gateway.type,
-            'owner': "USER:" + this.user.userID,
-            'layoutPosition': 'GATEWAY'
-        };
-        if (properties)
-            body['thingProperties'] = properties;
-        var deferred = Q.defer();
-        var options = {
-            method: 'POST',
-            url: this.app.site + "/thing-if/apps/" + this.app.appID + "/onboardings",
-            headers: {
-                authorization: "Bearer " + this.user.ownerToken,
-                'content-type': 'application/vnd.kii.onboardingWithVendorThingIDByOwner+json'
-            },
-            body: JSON.stringify(body)
-        };
-        request(options, function (error, response, body) {
-            if (error)
-                deferred.reject(new Error(error));
-            body = JSON.parse(body);
-            _this.gateway.thingID = body.thingID;
-            _this.gateway.accessToken = body.accessToken;
-            _this.gateway.mqttEndpoint = body.mqttEndpoint;
-            deferred.resolve(_this.gateway);
-        });
-        return deferred.promise;
-    };
     KiiHelper.prototype.onboardEndnodeByOwner = function (endNodeVendorThingID, properties) {
         var _this = this;
         var endnode = new model_1.EndNode(endNodeVendorThingID);
         var body = {
-            'endNodeVendorThingID': endnode.vendorThingID,
-            'endNodePassword': endnode.password,
-            'gatewayThingID': this.gateway.thingID,
-            'endNodeThingType': endnode.type,
-            'owner': "USER:" + this.user.userID
+            endNodeVendorThingID: endnode.vendorThingID,
+            endNodePassword: endnode.password,
+            gatewayThingID: this.gateway.thingID,
+            endNodeThingType: endnode.type,
+            owner: "USER:" + this.user.userID
         };
         if (properties)
-            body['endNodeThingProperties'] = properties;
+            body.endNodeThingProperties = properties;
         var deferred = Q.defer();
         var options = {
             method: 'POST',
@@ -77,12 +50,12 @@ var KiiHelper = (function () {
         });
         return deferred.promise;
     };
-    KiiHelper.prototype.updateEndnodeState = function (endNodeThingID, states) {
+    KiiHelper.prototype.updateEndnodeState = function (endnode, states) {
         var _this = this;
         var deferred = Q.defer();
         var options = {
             method: 'PUT',
-            url: this.app.site + ("/thing-if/apps/" + this.app.appID + "/targets/thing:" + endNodeThingID + "/states"),
+            url: this.app.site + ("/thing-if/apps/" + this.app.appID + "/targets/thing:" + endnode.thingID + "/states"),
             headers: {
                 authorization: "Bearer " + this.user.ownerToken,
                 'content-type': 'application/json'
@@ -102,12 +75,12 @@ var KiiHelper = (function () {
         });
         return deferred.promise;
     };
-    KiiHelper.prototype.updateEndnodeConnectivity = function (endNodeThingID, online) {
+    KiiHelper.prototype.updateEndnodeConnection = function (endNode, online) {
         var _this = this;
         var deferred = Q.defer();
         var options = {
             method: 'PUT',
-            url: this.app.site + ("/thing-if/apps/" + this.app.appID + "/things/" + this.gateway.thingID + "/end-nodes/" + endNodeThingID + "/connection"),
+            url: this.app.site + ("/thing-if/apps/" + this.app.appID + "/things/" + this.gateway.thingID + "/end-nodes/" + endNode.thingID + "/connection"),
             headers: {
                 authorization: "Bearer " + this.user.ownerToken,
                 'content-type': 'application/json'
@@ -129,11 +102,19 @@ var KiiHelper = (function () {
         });
         return deferred.promise;
     };
+    KiiHelper.prototype.gcByCounter = function () {
+        if (!global.gc)
+            return;
+        if (this.counter < this.maxRequest)
+            return;
+        this.counter = 0;
+        global.gc();
+    };
     KiiHelper.prototype.gc = function () {
         if (global.gc) {
             global.gc();
         }
     };
     return KiiHelper;
-}());
+}(KiiBase_1.KiiBase));
 exports.KiiHelper = KiiHelper;

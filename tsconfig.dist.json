@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "allowJs": true,
-        "allowUnreachableCode": true,
+        // "allowUnreachableCode": true,
         "module": "commonjs",
         "target": "es5",
         // "declaration": true,
@@ -12,6 +12,8 @@
         "outDir": "./dist"
     },
     "exclude": [
+        "**/a.ts",
+        "**/t.js",
         "build",
         "dist",
         "scripts",

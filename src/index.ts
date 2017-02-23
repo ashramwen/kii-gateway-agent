@@ -1,6 +1,6 @@
 /// <reference types='node' />
 /// <reference types='lowdb' />
-import { App, EndNode, EndNodes, Gateway, User, Mode } from './model/index';
+import { App, EndNode, EndNodes, Gateway, User } from './model/index';
 import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/index';
 
 import Q = require('q');
@@ -38,12 +38,13 @@ class KiiGatewayAgent {
   db: any;
   private timer;
 
-  constructor(mode: Mode) {
+  constructor() {
     KiiGatewayAgent.preinit();
-    if (mode === Mode.Http)
+    if (process.argv.indexOf('--mqtt') < 0)
       this.kii = new KiiHelper();
-    else
+    else {
       this.kii = new KiiMqttHelper();
+    }
     this.db = new low('./resource/db.json');
     this.kii.app = this.db.get('app').value() as App;
     this.kii.user = this.db.get('user').value() as User;
@@ -140,16 +141,21 @@ class KiiGatewayAgent {
   onboardEndnodeByOwner(endNodeVendorThingID: string, properties?) {
     let local_endnode = this.getEndnode(endNodeVendorThingID);
     let deferred = Q.defer();
-    this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties).then((endnode: EndNode) => {
-      if (local_endnode) {
-        this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
-      }
-      else {
-        this.db.get('endNodes').push(endnode).value();
-      }
-      this.kii.updateEndnodeConnectivity(endnode.thingID, true);
-      deferred.resolve(endnode);
-    }, error => deferred.reject(error));
+    let p = this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties)
+    if (p) {
+      p.then((endnode: EndNode) => {
+        if (local_endnode) {
+          this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+        }
+        else {
+          this.db.get('endNodes').push(endnode).value();
+        }
+        this.kii.updateEndnodeConnection(endnode, true);
+        deferred.resolve(endnode);
+      }, error => deferred.reject(error));
+    } else {
+      deferred.resolve();
+    }
     return deferred.promise;
   }
 
@@ -174,7 +180,7 @@ class KiiGatewayAgent {
       );
     } else {
       endnode.online = true;
-      this.updateEndnodeConnectivityByThingID(endnode.thingID, true).then(
+      this.kii.updateEndnodeState(endnode, true).then(
         (res) => {
           this.kii.updateEndnodeState(endnode, states).then(
             res => deferred.resolve(res),
@@ -190,24 +196,6 @@ class KiiGatewayAgent {
   }
 
   /**
-   * update endnode connectivity by thingID
-   *
-   * @param {string} endNodeThingID
-   * @param {boolean} online
-   * @returns {promise}
-   *
-   * @memberOf KiiGatewayAgent
-   */
-  updateEndnodeConnectivityByThingID(endNodeThingID: string, online: boolean) {
-    let deferred = Q.defer();
-    this.kii.updateEndnodeConnectivity(endNodeThingID, online).then(
-      res => deferred.resolve(res),
-      error => deferred.reject(error)
-    );
-    return deferred.promise
-  }
-
-  /**
    * update endnode connectivity by vendorThingID
    *
    * @param {string} endNodeVendorThingID
@@ -220,7 +208,7 @@ class KiiGatewayAgent {
     let node = this.getEndnode(endNodeVendorThingID);
     let deferred = Q.defer();
     if (node) {
-      this.updateEndnodeConnectivityByThingID(node.thingID, online).then(
+      this.kii.updateEndnodeConnection(node, online).then(
         res => deferred.resolve(res),
         error => deferred.reject(error)
       );
@@ -256,7 +244,7 @@ class KiiGatewayAgent {
     for (let endnode of endnodes) {
       if (!endnode.online) continue;
       if (now - endnode.lastUpdate < TIMESPAN) continue;
-      let promise = this.updateEndnodeConnectivityByThingID(endnode.thingID, false);
+      let promise = this.kii.updateEndnodeConnection(endnode, false);
       promise.then(res => {
         endnode.online = false;
         this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).value();
@@ -266,7 +254,7 @@ class KiiGatewayAgent {
     Q.allSettled(promises).then(results => {
       deferred.resolve(results);
     });
-    return deferred.promise
+    return deferred.promise;
   }
 
   /**

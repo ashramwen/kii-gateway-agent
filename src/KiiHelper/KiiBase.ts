@@ -151,5 +151,5 @@ export abstract class KiiBase {
    *
    * @memberOf KiiBase
    */
-  abstract updateEndnodeConnectivity(endNodeThingID: string, online: boolean);
+  abstract updateEndnodeConnection(endNode: EndNode, online: boolean);
 }

@@ -79,11 +79,11 @@ export class KiiHelper extends KiiBase {
   }
 
   // update endnode connectivity
-  updateEndnodeConnectivity(endNodeThingID: string, online: boolean) {
+  updateEndnodeConnection(endNode: EndNode, online: boolean) {
     let deferred = Q.defer();
     let options = {
       method: 'PUT',
-      url: this.app.site + `/thing-if/apps/${this.app.appID}/things/${this.gateway.thingID}/end-nodes/${endNodeThingID}/connection`,
+      url: this.app.site + `/thing-if/apps/${this.app.appID}/things/${this.gateway.thingID}/end-nodes/${endNode.thingID}/connection`,
       headers: {
         authorization: `Bearer ${this.user.ownerToken}`,
         'content-type': 'application/json'

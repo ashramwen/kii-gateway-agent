@@ -12,3 +12,9 @@ var Gateway = (function () {
     return Gateway;
 }());
 exports.Gateway = Gateway;
+var MqttEndpoint = (function () {
+    function MqttEndpoint() {
+    }
+    return MqttEndpoint;
+}());
+exports.MqttEndpoint = MqttEndpoint;
