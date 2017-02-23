@@ -90,7 +90,7 @@ export class KiiMqttHelper extends KiiBase {
     let mqtt = this.gateway.mqttEndpoint;
     let endpoint = `wss://${mqtt.host}:${mqtt.portWSS}/mqtt`;
     this.client = new Paho.MQTT.Client(endpoint, mqtt.mqttTopic);
-    this.client.onConnectionLost = this.onConnectionLost;
+    this.client.onConnectionLost = this.onConnectionLost.bind(this);
     this.client.onMessageArrived = this.onMessageArrived.bind(this);
 
     this.client.connect({
@@ -106,6 +106,8 @@ export class KiiMqttHelper extends KiiBase {
 
   private onConnectionLost(responseObject: Paho.MQTT.ResponseObject) {
     console.log('MQTT Connection Lost:', responseObject.errorMessage);
+    console.log('MQTT reconnecting.');
+    this.connectMqtt();
   }
 
   private onMessageArrived(message: Paho.MQTT.Message) {
