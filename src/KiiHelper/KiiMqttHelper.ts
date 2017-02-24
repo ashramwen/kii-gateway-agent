@@ -2,6 +2,7 @@
 /// <reference path="../mqtt/mqttws31.d.ts" />
 import Q = require('q');
 import request = require('request');
+import low = require('lowdb');
 const Paho = require('../mqtt/mqttws31');
 
 import { KiiBase } from './KiiBase';
@@ -10,6 +11,7 @@ import { App, EndNode, EndNodeBody, Gateway, User } from '../model';
 export class KiiMqttHelper extends KiiBase {
 
   client: Paho.MQTT.Client;
+  db: any = new low('./resource/db.json');
 
   constructor() {
     super();
@@ -30,21 +32,33 @@ export class KiiMqttHelper extends KiiBase {
     let deferred = Q.defer();
     let endnode = new EndNode(endNodeVendorThingID);
     let body = new EndNodeBody(endnode, this.gateway.thingID, this.user.userID, properties);
-
+    let local_endnode = this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).value();
+    if (local_endnode) {
+      this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
+    }
+    else {
+      try {
+        this.db.get('endNodes').push(endnode).write();
+      } catch (err) {
+        console.log(err);
+        throw err;
+      }
+    }
     let onboardingMessage = 'POST\n';
     onboardingMessage += 'Content-type:application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json\n';
     onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
 
     // TODO: generate ID to check it back
-    onboardingMessage += `X-Kii-RequestID:${endNodeVendorThingID} onboarding\n`;
+    onboardingMessage += `X-Kii-RequestID:${endNodeVendorThingID} onboardings\n`;
 
     // mandatory blank line
     onboardingMessage += '\n';
     onboardingMessage += JSON.stringify(body);
 
     let topic = `p/${this.gateway.mqttEndpoint.mqttTopic}/thing-if/apps/${this.app.appID}/onboardings`;
+
     this.sendMessage(topic, onboardingMessage);
-    deferred.resolve();
+    deferred.resolve(endnode);
     return deferred.promise;
   }
 
@@ -55,7 +69,7 @@ export class KiiMqttHelper extends KiiBase {
     onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
 
     // TODO: generate ID to check it back
-    onboardingMessage += `X-Kii-RequestID:${endnode.vendorThingID} update state\n`;
+    onboardingMessage += `X-Kii-RequestID:${endnode.vendorThingID} updateState\n`;
 
     // mandatory blank line
     onboardingMessage += '\n';
@@ -74,7 +88,7 @@ export class KiiMqttHelper extends KiiBase {
     onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
 
     // TODO: generate ID to check it back
-    onboardingMessage += `X-Kii-RequestID:${endnode.vendorThingID} update connection\n`;
+    onboardingMessage += `X-Kii-RequestID:${endnode.vendorThingID} updateConnection\n`;
 
     // mandatory blank line
     onboardingMessage += '\n';
@@ -111,11 +125,25 @@ export class KiiMqttHelper extends KiiBase {
   }
 
   private onMessageArrived(message: Paho.MQTT.Message) {
-    let payload: Array<string> = message.payloadString.split('\n');
-    if (+payload[0] > 299) {
-      let requestID = this.find(payload, 'X-Kii-RequestID:');
-      let msg = +payload[0] + requestID.replace('X-Kii-RequestID:', ' ');
-      console.log('MQTT Message Arrived:', msg);
+    console.log('onMessageArrived', message.payloadString);
+    let payload = this.parseResponse(message.payloadString);
+    console.log(JSON.stringify(payload));
+
+    if (payload.statusCode > 299) {
+      console.log(`MQTT Error: ${payload.requestID} ${payload.type}`);
+      return;
+    }
+
+    // onboardings
+    switch (payload.type) {
+      case 'onboardings':
+        let endnode = this.db.get('endNodes').find({ vendorThingID: payload.requestID }).value() as EndNode;
+        endnode.thingID = payload.body.endNodeThingID;
+        endnode.accessToken = payload.body.accessToken;
+        endnode.online = true;
+        this.db.get('endNodes').find({ 'vendorThingID': payload.requestID }).assign(endnode).write();
+        this.updateEndnodeConnection(endnode, true);
+        break;
     }
   }
 
@@ -128,17 +156,60 @@ export class KiiMqttHelper extends KiiBase {
     this.client.send(_message);
   }
 
-  private startsWith(source, searchString) {
-    return source.substr(0, searchString.length) === searchString;
-  }
+  // private includes(source: string, search: string, start?: number) {
+  //   if (!start) start = 0;
+  //   if (start + search.length > source.length) return false;
+  //   return source.indexOf(search, start) !== -1;
+  // }
 
-  private find(_array, predicate) {
-    let ret: string;
-    _array.forEach(s => {
-      if (this.startsWith(s, predicate))
-        ret = s;
-    })
-    return ret;
+  // private startsWith(source, searchString) {
+  //   return this.includes(source, searchString, 0);
+  // }
+
+  // private endsWith(source, searchString) {
+  //   if (searchString.length > source.length) return false;
+  //   return this.includes(source, searchString, source.length - searchString.length);
+  // }
+
+  // private find(_array, predicate) {
+  //   let ret: string;
+  //   _array.forEach(s => {
+  //     if (this.startsWith(s, predicate))
+  //       ret = s;
+  //   })
+  //   return ret;
+  // }
+
+  // private getRequest(payload: Array<string>) {
+  //   let requestID = this.find(payload, 'X-Kii-RequestID:');
+  //   requestID = requestID.replace('X-Kii-RequestID:', '');
+  //   return requestID.split(' ');
+  // }
+
+  private parseResponse(payloadString: string) {
+    const codeReg = /^(\d{3})/;
+    const requestReg = /X-Kii-RequestID:([^\n]*)/;
+    const bodyReg = /(\{[^}]*\})/;
+    let payload = new Payload();
+    payload.statusCode = +codeReg.exec(payloadString)[1];
+    let requestID = requestReg.exec(payloadString)[1].split(' ');
+    payload.requestID = requestID[0];
+    payload.type = requestID[1].replace('\r', '');
+    let m;
+    if ((m = bodyReg.exec(payloadString)) !== null) {
+      payload.body = JSON.parse(m[1]);
+    }
+    return payload;
   }
+}
+class Payload {
+  statusCode: number;
+  requestID: string;
+  type: string;
+  date: string;
+  body?: {
+    accessToken: string,
+    endNodeThingID: string
+  };
 }
 

@@ -1,5 +1,4 @@
 /// <reference types='node' />
-/// <reference types='lowdb' />
 import { App, EndNode, EndNodes, Gateway, User } from './model/index';
 import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/index';
 
@@ -36,11 +35,13 @@ class KiiGatewayAgent {
 
   kii: KiiBase;
   db: any;
+  isHttp: boolean;
   private timer;
 
   constructor() {
     KiiGatewayAgent.preinit();
-    if (process.argv.indexOf('--mqtt') < 0)
+    this.isHttp = process.argv.indexOf('--mqtt') < 0;
+    if (this.isHttp)
       this.kii = new KiiHelper();
     else {
       this.kii = new KiiMqttHelper();
@@ -141,21 +142,19 @@ class KiiGatewayAgent {
   onboardEndnodeByOwner(endNodeVendorThingID: string, properties?) {
     let local_endnode = this.getEndnode(endNodeVendorThingID);
     let deferred = Q.defer();
-    let p = this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties)
-    if (p) {
-      p.then((endnode: EndNode) => {
+    let p = this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties);
+    p.then((endnode: EndNode) => {
+      if (this.isHttp) {
         if (local_endnode) {
-          this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+          this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
         }
         else {
-          this.db.get('endNodes').push(endnode).value();
+          this.db.get('endNodes').push(endnode).write();
         }
         this.kii.updateEndnodeConnection(endnode, true);
-        deferred.resolve(endnode);
-      }, error => deferred.reject(error));
-    } else {
-      deferred.resolve();
-    }
+      }
+      deferred.resolve(endnode);
+    }, error => deferred.reject(error));
     return deferred.promise;
   }
 
@@ -168,7 +167,7 @@ class KiiGatewayAgent {
    *
    * @memberOf KiiGatewayAgent
    */
-  updateEndnodeState(endNodeVendorThingID: string, states?) {
+  updateEndnodeState(endNodeVendorThingID: string, states: Object) {
     let deferred = Q.defer();
 
     let endnode = this.getEndnode(endNodeVendorThingID);
@@ -191,7 +190,7 @@ class KiiGatewayAgent {
       );
     }
 
-    this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+    this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
     return deferred.promise;
   }
 
@@ -247,7 +246,7 @@ class KiiGatewayAgent {
       let promise = this.kii.updateEndnodeConnection(endnode, false);
       promise.then(res => {
         endnode.online = false;
-        this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).value();
+        this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).write();
       }, err => console.log(err));
       promises.push(promise);
     }
