@@ -5,6 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Q = require("q");
+var low = require("lowdb");
 var Paho = require('../mqtt/mqttws31');
 var KiiBase_1 = require("./KiiBase");
 var model_1 = require("../model");
@@ -12,6 +13,7 @@ var KiiMqttHelper = (function (_super) {
     __extends(KiiMqttHelper, _super);
     function KiiMqttHelper() {
         var _this = _super.call(this) || this;
+        _this.db = new low('./resource/db.json');
         console.log('running in MQTT mode.');
         return _this;
     }
@@ -27,15 +29,28 @@ var KiiMqttHelper = (function (_super) {
         var deferred = Q.defer();
         var endnode = new model_1.EndNode(endNodeVendorThingID);
         var body = new model_1.EndNodeBody(endnode, this.gateway.thingID, this.user.userID, properties);
+        var local_endnode = this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).value();
+        if (local_endnode) {
+            this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
+        }
+        else {
+            try {
+                this.db.get('endNodes').push(endnode).write();
+            }
+            catch (err) {
+                console.log(err);
+                throw err;
+            }
+        }
         var onboardingMessage = 'POST\n';
         onboardingMessage += 'Content-type:application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json\n';
         onboardingMessage += "Authorization:Bearer " + this.user.ownerToken + "\n";
-        onboardingMessage += "X-Kii-RequestID:" + endNodeVendorThingID + " onboarding\n";
+        onboardingMessage += "X-Kii-RequestID:" + endNodeVendorThingID + " onboardings\n";
         onboardingMessage += '\n';
         onboardingMessage += JSON.stringify(body);
         var topic = "p/" + this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + this.app.appID + "/onboardings";
         this.sendMessage(topic, onboardingMessage);
-        deferred.resolve();
+        deferred.resolve(endnode);
         return deferred.promise;
     };
     KiiMqttHelper.prototype.updateEndnodeState = function (endnode, states) {
@@ -43,7 +58,7 @@ var KiiMqttHelper = (function (_super) {
         var onboardingMessage = 'PUT\n';
         onboardingMessage += 'Content-type:application/json\n';
         onboardingMessage += "Authorization:Bearer " + this.user.ownerToken + "\n";
-        onboardingMessage += "X-Kii-RequestID:" + endnode.vendorThingID + " update state\n";
+        onboardingMessage += "X-Kii-RequestID:" + endnode.vendorThingID + " updateState\n";
         onboardingMessage += '\n';
         onboardingMessage += JSON.stringify(states);
         var topic = "p/" + this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + this.app.appID + "/targets/THING:" + endnode.thingID + "/states";
@@ -56,7 +71,7 @@ var KiiMqttHelper = (function (_super) {
         var onboardingMessage = 'PUT\n';
         onboardingMessage += 'Content-type:application/json\n';
         onboardingMessage += "Authorization:Bearer " + this.user.ownerToken + "\n";
-        onboardingMessage += "X-Kii-RequestID:" + endnode.vendorThingID + " update connection\n";
+        onboardingMessage += "X-Kii-RequestID:" + endnode.vendorThingID + " updateConnection\n";
         onboardingMessage += '\n';
         onboardingMessage += JSON.stringify({ 'online': online });
         var topic = "p/" + this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + this.app.appID + "/things/" + this.gateway.thingID + "/end-nodes/" + endnode.thingID + "/connection";
@@ -88,11 +103,22 @@ var KiiMqttHelper = (function (_super) {
         this.connectMqtt();
     };
     KiiMqttHelper.prototype.onMessageArrived = function (message) {
-        var payload = message.payloadString.split('\n');
-        if (+payload[0] > 299) {
-            var requestID = this.find(payload, 'X-Kii-RequestID:');
-            var msg = +payload[0] + requestID.replace('X-Kii-RequestID:', ' ');
-            console.log('MQTT Message Arrived:', msg);
+        console.log('onMessageArrived', message.payloadString);
+        var payload = this.parseResponse(message.payloadString);
+        console.log(JSON.stringify(payload));
+        if (payload.statusCode > 299) {
+            console.log("MQTT Error: " + payload.requestID + " " + payload.type);
+            return;
+        }
+        switch (payload.type) {
+            case 'onboardings':
+                var endnode = this.db.get('endNodes').find({ vendorThingID: payload.requestID }).value();
+                endnode.thingID = payload.body.endNodeThingID;
+                endnode.accessToken = payload.body.accessToken;
+                endnode.online = true;
+                this.db.get('endNodes').find({ 'vendorThingID': payload.requestID }).assign(endnode).write();
+                this.updateEndnodeConnection(endnode, true);
+                break;
         }
     };
     KiiMqttHelper.prototype.sendMessage = function (topic, message) {
@@ -100,18 +126,26 @@ var KiiMqttHelper = (function (_super) {
         _message.destinationName = topic;
         this.client.send(_message);
     };
-    KiiMqttHelper.prototype.startsWith = function (source, searchString) {
-        return source.substr(0, searchString.length) === searchString;
-    };
-    KiiMqttHelper.prototype.find = function (_array, predicate) {
-        var _this = this;
-        var ret;
-        _array.forEach(function (s) {
-            if (_this.startsWith(s, predicate))
-                ret = s;
-        });
-        return ret;
+    KiiMqttHelper.prototype.parseResponse = function (payloadString) {
+        var codeReg = /^(\d{3})/;
+        var requestReg = /X-Kii-RequestID:([^\n]*)/;
+        var bodyReg = /(\{[^}]*\})/;
+        var payload = new Payload();
+        payload.statusCode = +codeReg.exec(payloadString)[1];
+        var requestID = requestReg.exec(payloadString)[1].split(' ');
+        payload.requestID = requestID[0];
+        payload.type = requestID[1].replace('\r', '');
+        var m;
+        if ((m = bodyReg.exec(payloadString)) !== null) {
+            payload.body = JSON.parse(m[1]);
+        }
+        return payload;
     };
     return KiiMqttHelper;
 }(KiiBase_1.KiiBase));
 exports.KiiMqttHelper = KiiMqttHelper;
+var Payload = (function () {
+    function Payload() {
+    }
+    return Payload;
+}());

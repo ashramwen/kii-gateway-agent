@@ -7,7 +7,8 @@ var TIMESPAN = 300000;
 var KiiGatewayAgent = (function () {
     function KiiGatewayAgent() {
         KiiGatewayAgent.preinit();
-        if (process.argv.indexOf('--mqtt') < 0)
+        this.isHttp = process.argv.indexOf('--mqtt') < 0;
+        if (this.isHttp)
             this.kii = new index_1.KiiHelper();
         else {
             this.kii = new index_1.KiiMqttHelper();
@@ -64,21 +65,18 @@ var KiiGatewayAgent = (function () {
         var local_endnode = this.getEndnode(endNodeVendorThingID);
         var deferred = Q.defer();
         var p = this.kii.onboardEndnodeByOwner(endNodeVendorThingID, properties);
-        if (p) {
-            p.then(function (endnode) {
+        p.then(function (endnode) {
+            if (_this.isHttp) {
                 if (local_endnode) {
-                    _this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+                    _this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
                 }
                 else {
-                    _this.db.get('endNodes').push(endnode).value();
+                    _this.db.get('endNodes').push(endnode).write();
                 }
                 _this.kii.updateEndnodeConnection(endnode, true);
-                deferred.resolve(endnode);
-            }, function (error) { return deferred.reject(error); });
-        }
-        else {
-            deferred.resolve();
-        }
+            }
+            deferred.resolve(endnode);
+        }, function (error) { return deferred.reject(error); });
         return deferred.promise;
     };
     KiiGatewayAgent.prototype.updateEndnodeState = function (endNodeVendorThingID, states) {
@@ -95,7 +93,7 @@ var KiiGatewayAgent = (function () {
                 _this.kii.updateEndnodeState(endnode, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
             }, function (error) { deferred.reject(error); });
         }
-        this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).value();
+        this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
         return deferred.promise;
     };
     KiiGatewayAgent.prototype.updateEndnodeConnectivityByVendorThingID = function (endNodeVendorThingID, online) {
@@ -126,7 +124,7 @@ var KiiGatewayAgent = (function () {
             var promise = this_1.kii.updateEndnodeConnection(endnode, false);
             promise.then(function (res) {
                 endnode.online = false;
-                _this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).value();
+                _this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).write();
             }, function (err) { return console.log(err); });
             promises.push(promise);
         };
