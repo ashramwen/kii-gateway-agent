@@ -55,6 +55,7 @@ var KiiBase = (function () {
         return deferred.promise;
     };
     KiiBase.prototype.gcByCounter = function () {
+        console.log('gcByCounter');
         if (!global.gc)
             return;
         if (this.counter < this.maxRequest) {
@@ -62,13 +63,18 @@ var KiiBase = (function () {
         }
         else {
             this.counter = 0;
+            console.log('gc');
             global.gc();
         }
     };
     KiiBase.prototype.gcByTime = function () {
+        console.log('gcByTime');
         if (!global.gc)
             return;
-        setTimeout(function () { return global.gc(); }, 60000);
+        setTimeout(function () {
+            console.log('gc');
+            global.gc();
+        }, 60000);
     };
     return KiiBase;
 }());

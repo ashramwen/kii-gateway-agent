@@ -122,18 +122,24 @@ export abstract class KiiBase {
   }
 
   protected gcByCounter() {
+    console.log('gcByCounter');
     if (!global.gc) return;
     if (this.counter < this.maxRequest) {
       this.counter++;
     } else {
       this.counter = 0;
+      console.log('gc');
       global.gc();
     }
   }
 
   protected gcByTime() {
+    console.log('gcByTime');
     if (!global.gc) return;
-    setTimeout(() => global.gc(), 60000);
+    setTimeout(() => {
+      console.log('gc');
+      global.gc();
+    }, 60000);
   }
 
   /**
