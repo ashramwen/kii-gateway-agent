@@ -36,6 +36,7 @@ export abstract class KiiBase {
   private maxRequest: number = 10;
 
   constructor() {
+    if (global.gc) console.log('gc mode.');
     this.gateway = new Gateway();
   }
 
@@ -122,22 +123,18 @@ export abstract class KiiBase {
   }
 
   protected gcByCounter() {
-    console.log('gcByCounter');
     if (!global.gc) return;
     if (this.counter < this.maxRequest) {
       this.counter++;
     } else {
       this.counter = 0;
-      console.log('gc');
       global.gc();
     }
   }
 
   protected gcByTime() {
-    console.log('gcByTime');
     if (!global.gc) return;
-    setTimeout(() => {
-      console.log('gc');
+    setInterval(() => {
       global.gc();
     }, 60000);
   }
