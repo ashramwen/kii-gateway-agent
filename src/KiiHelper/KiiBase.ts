@@ -32,6 +32,9 @@ export abstract class KiiBase {
    */
   gateway: Gateway;
 
+  private counter: number = 0;
+  private maxRequest: number = 10;
+
   constructor() {
     this.gateway = new Gateway();
   }
@@ -106,6 +109,7 @@ export abstract class KiiBase {
     };
 
     request(options, (error, response, body) => {
+      this.gcByCounter();
       if (error) deferred.reject(new Error(error));
       body = JSON.parse(body);
       this.gateway.thingID = body.thingID;
@@ -117,6 +121,20 @@ export abstract class KiiBase {
     return deferred.promise;
   }
 
+  protected gcByCounter() {
+    if (!global.gc) return;
+    if (this.counter < this.maxRequest) {
+      this.counter++;
+    } else {
+      this.counter = 0;
+      global.gc();
+    }
+  }
+
+  protected gcByTime() {
+    if (!global.gc) return;
+    setTimeout(() => global.gc(), 60000);
+  }
 
   /**
    * onboard endnode with gateway by owner

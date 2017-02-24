@@ -9,10 +9,6 @@ import { App, EndNode, EndNodeBody, Gateway, User } from '../model';
 
 export class KiiHelper extends KiiBase {
 
-  private maxRequest: number = 10;
-  private counter: number = 0;
-  // private log;
-
   constructor() {
     super();
     console.log('running in Http mode.');
@@ -42,7 +38,7 @@ export class KiiHelper extends KiiBase {
     };
 
     request(options, (error, response, body) => {
-      this.gc();
+      this.gcByCounter();
       if (error) deferred.reject(new Error(error));
       body = JSON.parse(body);
       endnode.thingID = body.endNodeThingID;
@@ -66,7 +62,7 @@ export class KiiHelper extends KiiBase {
       body: JSON.stringify(states)
     };
     request(options, (error, response, body) => {
-      this.gc();
+      this.gcByCounter();
       if (response && response.statusCode === 204) {
         deferred.resolve(response.statusCode);
       }
@@ -93,7 +89,7 @@ export class KiiHelper extends KiiBase {
       })
     };
     request(options, (error, response, body) => {
-      this.gc();
+      this.gcByCounter();
       if (response && response.statusCode === 204) {
         deferred.resolve(response.statusCode);
       }
@@ -103,20 +99,5 @@ export class KiiHelper extends KiiBase {
       deferred.reject(body);
     });
     return deferred.promise;
-  }
-
-  private gcByCounter() {
-    if (!global.gc) return;
-    if (this.counter < this.maxRequest) return;
-    this.counter = 0;
-    // console.log('gc.');
-    global.gc();
-  }
-
-  private gc() {
-    if (global.gc) {
-      // console.log('gc.');
-      global.gc();
-    }
   }
 }

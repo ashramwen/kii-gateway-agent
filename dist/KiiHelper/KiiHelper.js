@@ -12,8 +12,6 @@ var KiiHelper = (function (_super) {
     __extends(KiiHelper, _super);
     function KiiHelper() {
         var _this = _super.call(this) || this;
-        _this.maxRequest = 10;
-        _this.counter = 0;
         console.log('running in Http mode.');
         return _this;
     }
@@ -40,7 +38,7 @@ var KiiHelper = (function (_super) {
             body: JSON.stringify(body)
         };
         request(options, function (error, response, body) {
-            _this.gc();
+            _this.gcByCounter();
             if (error)
                 deferred.reject(new Error(error));
             body = JSON.parse(body);
@@ -63,7 +61,7 @@ var KiiHelper = (function (_super) {
             body: JSON.stringify(states)
         };
         request(options, function (error, response, body) {
-            _this.gc();
+            _this.gcByCounter();
             if (response && response.statusCode === 204) {
                 deferred.resolve(response.statusCode);
             }
@@ -90,7 +88,7 @@ var KiiHelper = (function (_super) {
             })
         };
         request(options, function (error, response, body) {
-            _this.gc();
+            _this.gcByCounter();
             if (response && response.statusCode === 204) {
                 deferred.resolve(response.statusCode);
             }
@@ -101,19 +99,6 @@ var KiiHelper = (function (_super) {
             deferred.reject(body);
         });
         return deferred.promise;
-    };
-    KiiHelper.prototype.gcByCounter = function () {
-        if (!global.gc)
-            return;
-        if (this.counter < this.maxRequest)
-            return;
-        this.counter = 0;
-        global.gc();
-    };
-    KiiHelper.prototype.gc = function () {
-        if (global.gc) {
-            global.gc();
-        }
     };
     return KiiHelper;
 }(KiiBase_1.KiiBase));

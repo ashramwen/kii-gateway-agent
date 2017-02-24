@@ -1,7 +1,6 @@
 /// <reference types='node' />
 /// <reference path="../mqtt/mqttws31.d.ts" />
 import Q = require('q');
-import request = require('request');
 import low = require('lowdb');
 const Paho = require('../mqtt/mqttws31');
 
@@ -16,6 +15,7 @@ export class KiiMqttHelper extends KiiBase {
   constructor() {
     super();
     console.log('running in MQTT mode.');
+    this.gcByTime();
   }
 
   onboardGatewayByOwner(properties?) {
@@ -41,24 +41,27 @@ export class KiiMqttHelper extends KiiBase {
         this.db.get('endNodes').push(endnode).write();
       } catch (err) {
         console.log(err);
-        throw err;
       }
     }
-    let onboardingMessage = 'POST\n';
-    onboardingMessage += 'Content-type:application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json\n';
-    onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
 
-    // TODO: generate ID to check it back
-    onboardingMessage += `X-Kii-RequestID:${endNodeVendorThingID} onboardings\n`;
+    setTimeout(() => {
+      let onboardingMessage = 'POST\n';
+      onboardingMessage += 'Content-type:application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json\n';
+      onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
 
-    // mandatory blank line
-    onboardingMessage += '\n';
-    onboardingMessage += JSON.stringify(body);
+      // TODO: generate ID to check it back
+      onboardingMessage += `X-Kii-RequestID:${endNodeVendorThingID} onboardings\n`;
 
-    let topic = `p/${this.gateway.mqttEndpoint.mqttTopic}/thing-if/apps/${this.app.appID}/onboardings`;
+      // mandatory blank line
+      onboardingMessage += '\n';
+      onboardingMessage += JSON.stringify(body);
 
-    this.sendMessage(topic, onboardingMessage);
-    deferred.resolve(endnode);
+      let topic = `p/${this.gateway.mqttEndpoint.mqttTopic}/thing-if/apps/${this.app.appID}/onboardings`;
+
+      this.sendMessage(topic, onboardingMessage);
+      deferred.resolve(endnode);
+    }, 1000);
+
     return deferred.promise;
   }
 
@@ -125,9 +128,8 @@ export class KiiMqttHelper extends KiiBase {
   }
 
   private onMessageArrived(message: Paho.MQTT.Message) {
-    console.log('onMessageArrived', message.payloadString);
     let payload = this.parseResponse(message.payloadString);
-    console.log(JSON.stringify(payload));
+    // console.log('MQTT MessageArrived:', JSON.stringify(payload));
 
     if (payload.statusCode > 299) {
       console.log(`MQTT Error: ${payload.requestID} ${payload.type}`);
@@ -137,6 +139,7 @@ export class KiiMqttHelper extends KiiBase {
     // onboardings
     switch (payload.type) {
       case 'onboardings':
+        console.log(`MQTT Onboarding: ${payload.requestID}`);
         let endnode = this.db.get('endNodes').find({ vendorThingID: payload.requestID }).value() as EndNode;
         endnode.thingID = payload.body.endNodeThingID;
         endnode.accessToken = payload.body.accessToken;
@@ -202,6 +205,7 @@ export class KiiMqttHelper extends KiiBase {
     return payload;
   }
 }
+
 class Payload {
   statusCode: number;
   requestID: string;

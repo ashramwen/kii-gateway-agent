@@ -4,6 +4,8 @@ var request = require("request");
 var model_1 = require("../model");
 var KiiBase = (function () {
     function KiiBase() {
+        this.counter = 0;
+        this.maxRequest = 10;
         this.gateway = new model_1.Gateway();
     }
     KiiBase.prototype.setApp = function (_appID, _appKey, _site) {
@@ -41,6 +43,7 @@ var KiiBase = (function () {
             body: JSON.stringify(body)
         };
         request(options, function (error, response, body) {
+            _this.gcByCounter();
             if (error)
                 deferred.reject(new Error(error));
             body = JSON.parse(body);
@@ -50,6 +53,22 @@ var KiiBase = (function () {
             deferred.resolve(_this.gateway);
         });
         return deferred.promise;
+    };
+    KiiBase.prototype.gcByCounter = function () {
+        if (!global.gc)
+            return;
+        if (this.counter < this.maxRequest) {
+            this.counter++;
+        }
+        else {
+            this.counter = 0;
+            global.gc();
+        }
+    };
+    KiiBase.prototype.gcByTime = function () {
+        if (!global.gc)
+            return;
+        setTimeout(function () { return global.gc(); }, 60000);
     };
     return KiiBase;
 }());

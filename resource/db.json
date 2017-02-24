@@ -13,7 +13,7 @@
     "password": "12345",
     "vendorThingID": "3c15c2d23a38",
     "thingID": "th.ba28b2d34b60-8e0a-6e11-8a8f-06579ddf",
-    "accessToken": "1NegpzytuLI0VUkia-ZL43koFWETTL_3WpEaLGGa2yU",
+    "accessToken": "1B39kgwXAML-Mon_hLQtEmbiOR4HKkv15_cnvQDLKtk",
     "mqttEndpoint": {
       "installationID": "2637iuf8ya2wlsucnr1pfuvu6",
       "username": "a333fe49-TpFwgiPNmPfVEwu5qu415vB",
@@ -31,20 +31,101 @@
     {
       "type": "EnergyNode",
       "password": "12345",
-      "lastUpdate": 1487920576442,
+      "lastUpdate": 1487922927660,
       "online": true,
       "vendorThingID": "Donkey",
       "thingID": "th.ba28b2d34b60-8e0a-6e11-9a8f-0c795266",
-      "accessToken": "6G2jmZAdfMX13gsYKfIkWMDYtR7Rav-n0bFRLNWSguA"
+      "accessToken": "nWiP6bt-ftfQkln-4VSKVxzGipV9To9_MUVcyNQykjM"
     },
     {
       "type": "EnergyNode",
       "password": "12345",
-      "lastUpdate": 1487920302965,
+      "lastUpdate": 1487922880782,
       "online": true,
       "vendorThingID": "Donkey1",
       "thingID": "th.7c698b427320-587b-6e11-0b8f-042e3e99",
-      "accessToken": "1LmQvhQQmSbTFA3JcZN4vWyawHDU2hP9c67a5fz4_zU"
+      "accessToken": "bdPyBPoYQs00jU2WvrfVKrBw2N1Gy7uh43yt_vJeHew"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976009,
+      "online": true,
+      "vendorThingID": "Donkey2",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-02c2a5a5",
+      "accessToken": "YhF0fkKAeoe645EbZ0MNiCCD0Iv0LTppz6KVSBRLw_4"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976010,
+      "online": true,
+      "vendorThingID": "Donkey3",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-020f36a5",
+      "accessToken": "aMum1scfajXz9cTNMfL0m25wk9D_2yaaiuWvuc2YAB4"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976011,
+      "online": true,
+      "vendorThingID": "Donkey4",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-0693d5a5",
+      "accessToken": "GYXBR5NW2XO0EjtF4EEporM7B08TZVClTSQV2-dK_Pg"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976011,
+      "online": true,
+      "vendorThingID": "Donkey5",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-0f72c5a5",
+      "accessToken": "dxM4ZnuxNdaE5wFPUR1roY0AVWjdQ4h_0YAU_7gwe_U"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976012,
+      "online": true,
+      "vendorThingID": "Donkey6",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-09f106a5",
+      "accessToken": "5bZpzeaw1M-nektF5AArjkZxqMLZNseV_pA1X7OWmZ8"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976012,
+      "online": true,
+      "vendorThingID": "Donkey7",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-085a85a5",
+      "accessToken": "4frWInqqKzUNTsBjj0MMz3FB-WMsdf52rZdL7PieZ6g"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976013,
+      "online": true,
+      "vendorThingID": "Donkey8",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-0538f5a5",
+      "accessToken": "J4SfNmww6QdoWVLFjgPtozJuqmBeV7Nkiuex9x5uFUA"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976013,
+      "online": true,
+      "vendorThingID": "Donkey9",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-0f9016a5",
+      "accessToken": "hYHQGXRYg74fKklarVnXE9cXWEJwrefFrmRPu45NP8A"
+    },
+    {
+      "type": "EnergyNode",
+      "password": "12345",
+      "lastUpdate": 1487920976014,
+      "online": true,
+      "vendorThingID": "Donkey10",
+      "thingID": "th.ba28b2d34b60-8e0a-6e11-3b9f-036a16a5",
+      "accessToken": "k1Zivr0ZfXUN6CNroC9P9NVyqzrsn8Kg6M4dTjRXW5U"
     }
   ]
 }

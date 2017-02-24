@@ -15,6 +15,7 @@ var KiiMqttHelper = (function (_super) {
         var _this = _super.call(this) || this;
         _this.db = new low('./resource/db.json');
         console.log('running in MQTT mode.');
+        _this.gcByTime();
         return _this;
     }
     KiiMqttHelper.prototype.onboardGatewayByOwner = function (properties) {
@@ -26,6 +27,7 @@ var KiiMqttHelper = (function (_super) {
         return deferred.promise;
     };
     KiiMqttHelper.prototype.onboardEndnodeByOwner = function (endNodeVendorThingID, properties) {
+        var _this = this;
         var deferred = Q.defer();
         var endnode = new model_1.EndNode(endNodeVendorThingID);
         var body = new model_1.EndNodeBody(endnode, this.gateway.thingID, this.user.userID, properties);
@@ -39,18 +41,19 @@ var KiiMqttHelper = (function (_super) {
             }
             catch (err) {
                 console.log(err);
-                throw err;
             }
         }
-        var onboardingMessage = 'POST\n';
-        onboardingMessage += 'Content-type:application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json\n';
-        onboardingMessage += "Authorization:Bearer " + this.user.ownerToken + "\n";
-        onboardingMessage += "X-Kii-RequestID:" + endNodeVendorThingID + " onboardings\n";
-        onboardingMessage += '\n';
-        onboardingMessage += JSON.stringify(body);
-        var topic = "p/" + this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + this.app.appID + "/onboardings";
-        this.sendMessage(topic, onboardingMessage);
-        deferred.resolve(endnode);
+        setTimeout(function () {
+            var onboardingMessage = 'POST\n';
+            onboardingMessage += 'Content-type:application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json\n';
+            onboardingMessage += "Authorization:Bearer " + _this.user.ownerToken + "\n";
+            onboardingMessage += "X-Kii-RequestID:" + endNodeVendorThingID + " onboardings\n";
+            onboardingMessage += '\n';
+            onboardingMessage += JSON.stringify(body);
+            var topic = "p/" + _this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + _this.app.appID + "/onboardings";
+            _this.sendMessage(topic, onboardingMessage);
+            deferred.resolve(endnode);
+        }, 1000);
         return deferred.promise;
     };
     KiiMqttHelper.prototype.updateEndnodeState = function (endnode, states) {
@@ -103,15 +106,14 @@ var KiiMqttHelper = (function (_super) {
         this.connectMqtt();
     };
     KiiMqttHelper.prototype.onMessageArrived = function (message) {
-        console.log('onMessageArrived', message.payloadString);
         var payload = this.parseResponse(message.payloadString);
-        console.log(JSON.stringify(payload));
         if (payload.statusCode > 299) {
             console.log("MQTT Error: " + payload.requestID + " " + payload.type);
             return;
         }
         switch (payload.type) {
             case 'onboardings':
+                console.log("MQTT Onboarding: " + payload.requestID);
                 var endnode = this.db.get('endNodes').find({ vendorThingID: payload.requestID }).value();
                 endnode.thingID = payload.body.endNodeThingID;
                 endnode.accessToken = payload.body.accessToken;
