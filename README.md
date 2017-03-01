@@ -31,7 +31,7 @@ The run-scripts used:
     coverage    : prints coverage report over typescript source
 
 ## Structure
-The directory structure of a typical project:
+The `src` directory structure of a typical project:
 
     ├── KiiHelper
     │   ├── KiiBase.ts
