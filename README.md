@@ -6,8 +6,6 @@ This package take an opinioned view on the Developer-Experience with an eye towa
 There are four operations that will be part of a developer experience:
 - `npm build`: cleans, lints, builds and tests with coverage metrics.
 - `npm build:dist`: generates distribution artifacts
-- `git commit`: a pre-commit hook runs tests with coverage
-- `git push`: a pre-push hook runs coverage-check, checks packages for updates and unpatched vulnerabilities
 
 The process is meant to serve as an early-warning mechanism to catch issues that will cause
 potentially expensive mishaps or re-work later in the project life-cycle.
@@ -36,15 +34,20 @@ The run-scripts used:
 The directory structure of a typical project:
 
     ├── KiiHelper
-    │   └── KiiHelper.ts
+    │   ├── KiiBase.ts
+    │   ├── KiiHelper.ts
+    │   ├── KiiMqttHelper.ts
+    │   └── index.ts
     ├── model
     │   ├── App.ts
     │   ├── EndNode.ts
     │   ├── Gateway.ts
     │   ├── User.ts
     │   └── index.ts
+    ├── mqtt
+    │   ├── mqttws31.d.ts
+    │   └── mqttws31.js
     ├── index.ts
-    ├── init.ts
     └── test.ts
 
 In addition, these directories are auto-created by the various scripts. The coverage & build directories are .gitignored. By design, dist directories are - for pure-Type/JavaScript packages, this is an advantage. If your package included native/compiled artifacts, it might need to be reconsidered.
