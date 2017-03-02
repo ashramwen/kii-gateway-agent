@@ -9,6 +9,11 @@ import fs = require('fs');
 
 const TIMESPAN = 300000; // 5 mins
 
+/**
+ * KiiGatewayAgent
+ *
+ * @class KiiGatewayAgent
+ */
 class KiiGatewayAgent {
   static preinit() {
     let dir = './resource';
@@ -53,11 +58,11 @@ class KiiGatewayAgent {
   }
 
   /**
-   * set app
+   * set app info
    *
-   * @param {string} _appID
-   * @param {string} _appKey
-   * @param {string} _site
+   * @param {string} _appID appID
+   * @param {string} _appKey appKey
+   * @param {string} _site site
    * @memberOf KiiGatewayAgent
    */
   setApp(_appID: string, _appKey: string, _site: string) {
@@ -66,11 +71,11 @@ class KiiGatewayAgent {
   }
 
   /**
-   * set app without overwriting the configuration
+   * set app info without overwriting the configuration
    *
-   * @param {string} _appID
-   * @param {string} _appKey
-   * @param {string} _site
+   * @param {string} _appID appID
+   * @param {string} _appKey appKey
+   * @param {string} _site site
    * @memberOf KiiGatewayAgent
    */
   setTemporaryApp(_appID: string, _appKey: string, _site: string) {
@@ -78,34 +83,34 @@ class KiiGatewayAgent {
   }
 
   /**
-   * set user
+   * set user info
    *
-   * @param {string} ownerToken
-   * @param {string} ownerID
+   * @param {string} ownerToken ownerToken
+   * @param {string} userID userID
    *
    * @memberOf KiiGatewayAgent
    */
-  setUser(ownerToken: string, ownerID: string) {
-    this.setTemporaryUser(ownerToken, ownerID);
+  setUser(ownerToken: string, userID: string) {
+    this.setTemporaryUser(ownerToken, userID);
     this.db.set('user', this.kii.user).value();
   }
 
   /**
    * set user without overwriting the configuration
    *
-   * @param {string} ownerToken
-   * @param {string} ownerID
+   * @param {string} ownerToken ownerToken
+   * @param {string} userID userID
    *
    * @memberOf KiiGatewayAgent
    */
-  setTemporaryUser(ownerToken: string, ownerID: string) {
-    this.kii.setUser(ownerToken, ownerID);
+  setTemporaryUser(ownerToken: string, userID: string) {
+    this.kii.setUser(ownerToken, userID);
   }
 
   /**
    * onboard gateway by owner
    *
-   * @param {any} [properties]
+   * @param {any} [properties] properties
    * @returns {promise}
    *
    * @memberOf KiiGatewayAgent
@@ -120,7 +125,7 @@ class KiiGatewayAgent {
   }
 
   /**
-   * return if gateway is onboarding or not (by gateway thingID)
+   * return if the gateway is onboarding or not (by gateway thingID)
    *
    * @returns {boolean}
    *

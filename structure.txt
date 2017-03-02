@@ -1,14 +1,19 @@
 src/
 ├── KiiHelper
-│   └── KiiHelper.ts
+│   ├── KiiBase.ts
+│   ├── KiiHelper.ts
+│   ├── KiiMqttHelper.ts
+│   └── index.ts
 ├── model
 │   ├── App.ts
 │   ├── EndNode.ts
 │   ├── Gateway.ts
 │   ├── User.ts
 │   └── index.ts
+├── mqtt
+│   ├── mqttws31.d.ts
+│   └── mqttws31.js
 ├── index.ts
-├── init.ts
 └── test.ts
 
-2 directories, 9 files
+3 directories, 13 files

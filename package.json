@@ -8,6 +8,7 @@
     "dist"
   ],
   "scripts": {
+    "docs": "jsdoc -c jsdoc.json",
     "check-engines": "check-engines",
     "staged-mods-ok": "git-mods --staged_ok",
     "no-mods": "git-mods",
