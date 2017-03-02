@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "docs": "jsdoc -c jsdoc.json",
+    "docs": "node_modules/.bin/jsdoc -c jsdoc.json",
     "check-engines": "check-engines",
     "staged-mods-ok": "git-mods --staged_ok",
     "no-mods": "git-mods",
@@ -96,6 +96,7 @@
     "git-mods": "^1.0.0",
     "graceful-fs": "^4.1.9",
     "istanbul": "^0.4.4",
+    "jsdoc": "^3.4.3",
     "mocha": "^3.2.0",
     "node-emoji": "^1.4.1",
     "npm-check": "^5.2.3",
