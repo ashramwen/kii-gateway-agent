@@ -3,7 +3,7 @@ kii-gateway-agent for node modules written in TypeScript.
 
 ## DX & minimizing tech-debt
 This package take an opinioned view on the Developer-Experience with an eye towards minimizing tech-debt.
-There are four operations that will be part of a developer experience:
+There are two operations that will be part of a developer experience:
 - `npm build`: cleans, lints, builds and tests with coverage metrics.
 - `npm build:dist`: generates distribution artifacts
 
