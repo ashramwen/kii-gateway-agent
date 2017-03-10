@@ -32,7 +32,11 @@ export class KiiHelper extends KiiBase {
       url: `${this.app.site}/thing-if/apps/${this.app.appID}/onboardings`,
       headers: {
         authorization: `Bearer ${this.user.ownerToken}`,
-        'content-type': 'application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json'
+        'content-type': 'application/vnd.kii.OnboardingEndNodeWithGatewayThingID+json',
+        'Connection': 'keep-alive'
+      },
+      agentOptions: {
+        ciphers: 'DES-CBC3-SHA'
       },
       body: JSON.stringify(body)
     };
@@ -57,7 +61,11 @@ export class KiiHelper extends KiiBase {
       url: this.app.site + `/thing-if/apps/${this.app.appID}/targets/thing:${endnode.thingID}/states`,
       headers: {
         authorization: `Bearer ${this.user.ownerToken}`,
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'Connection': 'keep-alive'
+      },
+      agentOptions: {
+        ciphers: 'DES-CBC3-SHA'
       },
       body: JSON.stringify(states)
     };
@@ -82,7 +90,11 @@ export class KiiHelper extends KiiBase {
       url: this.app.site + `/thing-if/apps/${this.app.appID}/things/${this.gateway.thingID}/end-nodes/${endNode.thingID}/connection`,
       headers: {
         authorization: `Bearer ${this.user.ownerToken}`,
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'Connection': 'keep-alive'
+      },
+      agentOptions: {
+        ciphers: 'DES-CBC3-SHA'
       },
       body: JSON.stringify({
         'online': online

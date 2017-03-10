@@ -40,7 +40,11 @@ var KiiBase = (function () {
             url: this.app.site + "/thing-if/apps/" + this.app.appID + "/onboardings",
             headers: {
                 authorization: "Bearer " + this.user.ownerToken,
-                'content-type': 'application/vnd.kii.onboardingWithVendorThingIDByOwner+json'
+                'content-type': 'application/vnd.kii.onboardingWithVendorThingIDByOwner+json',
+                'Connection': 'keep-alive'
+            },
+            agentOptions: {
+                ciphers: 'DES-CBC3-SHA'
             },
             body: JSON.stringify(body)
         };

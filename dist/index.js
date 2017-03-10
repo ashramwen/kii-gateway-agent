@@ -41,12 +41,12 @@ var KiiGatewayAgent = (function () {
     KiiGatewayAgent.prototype.setTemporaryApp = function (_appID, _appKey, _site) {
         this.kii.setApp(_appID, _appKey, _site);
     };
-    KiiGatewayAgent.prototype.setUser = function (ownerToken, ownerID) {
-        this.setTemporaryUser(ownerToken, ownerID);
+    KiiGatewayAgent.prototype.setUser = function (ownerToken, userID) {
+        this.setTemporaryUser(ownerToken, userID);
         this.db.set('user', this.kii.user).value();
     };
-    KiiGatewayAgent.prototype.setTemporaryUser = function (ownerToken, ownerID) {
-        this.kii.setUser(ownerToken, ownerID);
+    KiiGatewayAgent.prototype.setTemporaryUser = function (ownerToken, userID) {
+        this.kii.setUser(ownerToken, userID);
     };
     KiiGatewayAgent.prototype.onboardGatewayByOwner = function (properties) {
         var _this = this;
