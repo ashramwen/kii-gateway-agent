@@ -35,7 +35,7 @@ class KiiGatewayAgent {
         'ownerToken': 'ownerToken',
         'userID': 'userID'
       }, gateway: {}, endNodes: []
-    }).value();
+    }).write();
   }
 
   kii: KiiBase;
@@ -172,21 +172,19 @@ class KiiGatewayAgent {
    *
    * @memberOf KiiGatewayAgent
    */
-  updateEndnodeState(endNodeVendorThingID: string, states: Object) {
+  updateEndnodeState(endnode: EndNode) {
     let deferred = Q.defer();
-
-    let endnode = this.getEndnode(endNodeVendorThingID);
     endnode.lastUpdate = new Date().valueOf();
     if (endnode.online) {
-      this.kii.updateEndnodeState(endnode, states).then(
+      this.kii.updateEndnodeState(endnode).then(
         res => deferred.resolve(res),
         error => deferred.reject(error)
       );
     } else {
       endnode.online = true;
-      this.kii.updateEndnodeState(endnode, true).then(
+      this.kii.updateEndnodeConnection(endnode, true).then(
         (res) => {
-          this.kii.updateEndnodeState(endnode, states).then(
+          this.kii.updateEndnodeState(endnode).then(
             res => deferred.resolve(res),
             error => deferred.reject(error)
           );
@@ -195,7 +193,7 @@ class KiiGatewayAgent {
       );
     }
 
-    this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
+    this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).write();
     return deferred.promise;
   }
 

@@ -9,15 +9,14 @@ export class EndNode {
   password: string = '12345';
   lastUpdate: number = new Date().valueOf();
   online: boolean = true;
+  state?: any;
 
   constructor(vendorThingID: string) {
     this.vendorThingID = vendorThingID;
   }
-
 }
 
 export declare type EndNodes = EndNode[];
-
 
 export class EndNodeBody {
   endNodeVendorThingID: string;

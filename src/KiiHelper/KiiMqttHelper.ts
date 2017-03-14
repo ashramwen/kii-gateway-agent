@@ -9,8 +9,7 @@ import { App, EndNode, EndNodeBody, Gateway, User } from '../model';
 
 export class KiiMqttHelper extends KiiBase {
 
-  client: Paho.MQTT.Client;
-  db: any = new low('./resource/db.json');
+  private client: Paho.MQTT.Client;
 
   constructor() {
     super();
@@ -65,21 +64,25 @@ export class KiiMqttHelper extends KiiBase {
     return deferred.promise;
   }
 
-  updateEndnodeState(endnode: EndNode, states) {
+  updateEndnodeState(endnode: EndNode) {
     let deferred = Q.defer();
-    let onboardingMessage = 'PUT\n';
-    onboardingMessage += 'Content-type:application/json\n';
-    onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
+    if (this.client.isConnected) {
+      let onboardingMessage = 'PUT\n';
+      onboardingMessage += 'Content-type:application/json\n';
+      onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;
 
-    // TODO: generate ID to check it back
-    onboardingMessage += `X-Kii-RequestID:${endnode.vendorThingID} updateState\n`;
+      // TODO: generate ID to check it back
+      onboardingMessage += `X-Kii-RequestID:${endnode.vendorThingID} updateState\n`;
 
-    // mandatory blank line
-    onboardingMessage += '\n';
-    onboardingMessage += JSON.stringify(states);
+      // mandatory blank line
+      onboardingMessage += '\n';
+      onboardingMessage += JSON.stringify(endnode.state);
 
-    let topic = `p/${this.gateway.mqttEndpoint.mqttTopic}/thing-if/apps/${this.app.appID}/targets/THING:${endnode.thingID}/states`;
-    this.sendMessage(topic, onboardingMessage);
+      let topic = `p/${this.gateway.mqttEndpoint.mqttTopic}/thing-if/apps/${this.app.appID}/targets/THING:${endnode.thingID}/states`;
+      this.sendMessage(topic, onboardingMessage);
+    } else {
+      this.cacheStates(endnode);
+    }
     deferred.resolve();
     return deferred.promise;
   }

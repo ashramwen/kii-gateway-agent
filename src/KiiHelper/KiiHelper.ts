@@ -54,7 +54,7 @@ export class KiiHelper extends KiiBase {
   }
 
   // update endnode state
-  updateEndnodeState(endnode, states) {
+  updateEndnodeState(endnode: EndNode) {
     let deferred = Q.defer();
     let options = {
       method: 'PUT',
@@ -67,13 +67,15 @@ export class KiiHelper extends KiiBase {
       agentOptions: {
         ciphers: 'DES-CBC3-SHA'
       },
-      body: JSON.stringify(states)
+      body: JSON.stringify(endnode.state)
     };
     request(options, (error, response, body) => {
       this.gcByCounter();
       if (response && response.statusCode === 204) {
         deferred.resolve(response.statusCode);
+        return;
       }
+      this.cacheStates(endnode);
       if (error) {
         deferred.reject(new Error(error));
       };

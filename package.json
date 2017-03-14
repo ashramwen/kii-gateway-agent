@@ -81,6 +81,7 @@
   "devDependencies": {
     "@types/chai": "^3.4.30",
     "@types/circular-json": "^0.1.29",
+    "@types/lodash": "^4.14.55",
     "@types/mocha": "^2.2.38",
     "@types/node": "^7.0.3",
     "@types/q": "0.0.32",
@@ -115,6 +116,7 @@
     "typescript": "^2.1.5"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "lowdb": "^0.15.5",
     "macaddress": "^0.2.8",
     "q": "^1.4.1",
