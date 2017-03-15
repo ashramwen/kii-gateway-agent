@@ -32,7 +32,7 @@ var KiiGatewayAgent = (function () {
                 'ownerToken': 'ownerToken',
                 'userID': 'userID'
             }, gateway: {}, endNodes: []
-        }).value();
+        }).write();
     };
     KiiGatewayAgent.prototype.setApp = function (_appID, _appKey, _site) {
         this.setTemporaryApp(_appID, _appKey, _site);
@@ -79,21 +79,21 @@ var KiiGatewayAgent = (function () {
         }, function (error) { return deferred.reject(error); });
         return deferred.promise;
     };
-    KiiGatewayAgent.prototype.updateEndnodeState = function (endNodeVendorThingID, states) {
+    KiiGatewayAgent.prototype.updateEndnodeState = function (endnode, states) {
         var _this = this;
+        endnode.state = states;
         var deferred = Q.defer();
-        var endnode = this.getEndnode(endNodeVendorThingID);
         endnode.lastUpdate = new Date().valueOf();
         if (endnode.online) {
-            this.kii.updateEndnodeState(endnode, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
+            this.kii.updateEndnodeState(endnode).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
         }
         else {
             endnode.online = true;
-            this.kii.updateEndnodeState(endnode, true).then(function (res) {
-                _this.kii.updateEndnodeState(endnode, states).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
+            this.kii.updateEndnodeConnection(endnode, true).then(function (res) {
+                _this.kii.updateEndnodeState(endnode).then(function (res) { return deferred.resolve(res); }, function (error) { return deferred.reject(error); });
             }, function (error) { deferred.reject(error); });
         }
-        this.db.get('endNodes').find({ 'vendorThingID': endNodeVendorThingID }).assign(endnode).write();
+        this.db.get('endNodes').find({ 'vendorThingID': endnode.vendorThingID }).assign(endnode).write();
         return deferred.promise;
     };
     KiiGatewayAgent.prototype.updateEndnodeConnectivityByVendorThingID = function (endNodeVendorThingID, online) {

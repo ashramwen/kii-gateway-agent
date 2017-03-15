@@ -67,6 +67,7 @@ export class KiiMqttHelper extends KiiBase {
   updateEndnodeState(endnode: EndNode) {
     let deferred = Q.defer();
     if (this.client.isConnected) {
+      this.bulkES();
       let onboardingMessage = 'PUT\n';
       onboardingMessage += 'Content-type:application/json\n';
       onboardingMessage += `Authorization:Bearer ${this.user.ownerToken}\n`;

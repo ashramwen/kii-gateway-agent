@@ -72,17 +72,20 @@ describe('Kii Gateway Agent', () => {
   });
 
   describe('.updateEndnodeState()', () => {
-    let result
+    let result;
     beforeEach(done => {
+      let node = gatewayAgent.getEndnode('Donkey');
       gatewayAgent.updateEndnodeState(
-        'Donkey', // endnode vendorThingID
+        node, // endnode vendorThingID
         {
-          'batteryAlias': {
-            'power': true
-          },
-          'lampAlias': {
-            'power': true
-          }
+          'activeTotal': 123,
+          'activeMD': 0,
+          'apparentTotal': 456,
+          'Timestamp': new Date().valueOf(),
+          'deviceID': 'Donkey1',
+          'apparentMD': 0,
+          'apparentTotalChange': 0,
+          'activeTotalChange': 0
         } // endnode states
       ).then(chainOutput => {
         result = chainOutput;

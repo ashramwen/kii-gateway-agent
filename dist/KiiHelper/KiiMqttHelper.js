@@ -5,7 +5,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Q = require("q");
-var low = require("lowdb");
 var Paho = require('../mqtt/mqttws31');
 var KiiBase_1 = require("./KiiBase");
 var model_1 = require("../model");
@@ -13,7 +12,6 @@ var KiiMqttHelper = (function (_super) {
     __extends(KiiMqttHelper, _super);
     function KiiMqttHelper() {
         var _this = _super.call(this) || this;
-        _this.db = new low('./resource/db.json');
         console.log('running in MQTT mode.');
         _this.gcByTime();
         return _this;
@@ -56,16 +54,22 @@ var KiiMqttHelper = (function (_super) {
         }, 1000);
         return deferred.promise;
     };
-    KiiMqttHelper.prototype.updateEndnodeState = function (endnode, states) {
+    KiiMqttHelper.prototype.updateEndnodeState = function (endnode) {
         var deferred = Q.defer();
-        var onboardingMessage = 'PUT\n';
-        onboardingMessage += 'Content-type:application/json\n';
-        onboardingMessage += "Authorization:Bearer " + this.user.ownerToken + "\n";
-        onboardingMessage += "X-Kii-RequestID:" + endnode.vendorThingID + " updateState\n";
-        onboardingMessage += '\n';
-        onboardingMessage += JSON.stringify(states);
-        var topic = "p/" + this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + this.app.appID + "/targets/THING:" + endnode.thingID + "/states";
-        this.sendMessage(topic, onboardingMessage);
+        if (this.client.isConnected) {
+            this.bulkES();
+            var onboardingMessage = 'PUT\n';
+            onboardingMessage += 'Content-type:application/json\n';
+            onboardingMessage += "Authorization:Bearer " + this.user.ownerToken + "\n";
+            onboardingMessage += "X-Kii-RequestID:" + endnode.vendorThingID + " updateState\n";
+            onboardingMessage += '\n';
+            onboardingMessage += JSON.stringify(endnode.state);
+            var topic = "p/" + this.gateway.mqttEndpoint.mqttTopic + "/thing-if/apps/" + this.app.appID + "/targets/THING:" + endnode.thingID + "/states";
+            this.sendMessage(topic, onboardingMessage);
+        }
+        else {
+            this.cacheStates(endnode);
+        }
         deferred.resolve();
         return deferred.promise;
     };

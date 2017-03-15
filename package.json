@@ -1,6 +1,6 @@
 {
   "name": "kii-gateway-agent",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "kii-gateway-agent for node module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

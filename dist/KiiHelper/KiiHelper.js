@@ -52,7 +52,7 @@ var KiiHelper = (function (_super) {
         });
         return deferred.promise;
     };
-    KiiHelper.prototype.updateEndnodeState = function (endnode, states) {
+    KiiHelper.prototype.updateEndnodeState = function (endnode) {
         var _this = this;
         var deferred = Q.defer();
         var options = {
@@ -66,13 +66,16 @@ var KiiHelper = (function (_super) {
             agentOptions: {
                 ciphers: 'DES-CBC3-SHA'
             },
-            body: JSON.stringify(states)
+            body: JSON.stringify(endnode.state)
         };
         request(options, function (error, response, body) {
             _this.gcByCounter();
             if (response && response.statusCode === 204) {
+                _this.bulkES();
                 deferred.resolve(response.statusCode);
+                return;
             }
+            _this.cacheStates(endnode);
             if (error) {
                 deferred.reject(new Error(error));
             }

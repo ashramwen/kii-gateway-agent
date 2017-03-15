@@ -172,7 +172,8 @@ class KiiGatewayAgent {
    *
    * @memberOf KiiGatewayAgent
    */
-  updateEndnodeState(endnode: EndNode) {
+  updateEndnodeState(endnode: EndNode, states: any) {
+    endnode.state = states;
     let deferred = Q.defer();
     endnode.lastUpdate = new Date().valueOf();
     if (endnode.online) {

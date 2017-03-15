@@ -72,6 +72,7 @@ export class KiiHelper extends KiiBase {
     request(options, (error, response, body) => {
       this.gcByCounter();
       if (response && response.statusCode === 204) {
+        this.bulkES();
         deferred.resolve(response.statusCode);
         return;
       }
