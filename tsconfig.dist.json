@@ -13,6 +13,8 @@
     },
     "exclude": [
         "**/a.ts",
+        "**/b.ts",
+        "**/c.ts",
         "**/t.js",
         "build",
         "dist",

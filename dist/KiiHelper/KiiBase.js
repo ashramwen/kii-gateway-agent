@@ -139,7 +139,7 @@ var KiiBase = (function () {
             return false;
         }
         this.lastBulk = new Date().valueOf();
-        return false;
+        return true;
     };
     KiiBase.prototype.traverseCacheState = function () {
         var _this = this;

@@ -280,7 +280,7 @@ export abstract class KiiBase {
       return false;
     }
     this.lastBulk = new Date().valueOf();
-    return false;
+    return true;
   }
 
   /**

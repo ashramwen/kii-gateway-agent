@@ -13,7 +13,7 @@
     "password": "12345",
     "vendorThingID": "3c15c2d23a38",
     "thingID": "th.ba28b2d34b60-8e0a-6e11-8a8f-06579ddf",
-    "accessToken": "TUV1BzNaXVrGOeuk8-2QXlkNySUI6doFzjo1V_85y2I",
+    "accessToken": "zO6j_fDZBJmWnWS8gzp9OzwyL1hCCgiIXYbsvilwZgA",
     "mqttEndpoint": {
       "installationID": "2637iuf8ya2wlsucnr1pfuvu6",
       "username": "a333fe49-TpFwgiPNmPfVEwu5qu415vB",
@@ -31,21 +31,21 @@
     {
       "type": "EnergyNode",
       "password": "12345",
-      "lastUpdate": 1489645380068,
+      "lastUpdate": 1489646434059,
       "online": true,
       "vendorThingID": "Donkey",
       "state": {
         "activeTotal": 123,
         "activeMD": 0,
         "apparentTotal": 456,
-        "Timestamp": 1489645380068,
+        "Timestamp": 1489646434059,
         "deviceID": "Donkey1",
         "apparentMD": 0,
         "apparentTotalChange": 0,
         "activeTotalChange": 0
       },
       "thingID": "th.ba28b2d34b60-8e0a-6e11-9a8f-0c795266",
-      "accessToken": "b0G8fBXGh4MvVbIKTPFDkRlH533tWdCEY5C-yQE2uYg"
+      "accessToken": "SgqrLlhlVMs6ayvWyNVIbUvhUfLTt0VqSIlK_Y_Ue8Y"
     },
     {
       "type": "EnergyNode",
