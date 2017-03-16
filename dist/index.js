@@ -1,5 +1,5 @@
 "use strict";
-var index_1 = require("./KiiHelper/index");
+var _1 = require("./KiiHelper/");
 var Q = require("q");
 var low = require("lowdb");
 var fs = require("fs");
@@ -9,9 +9,9 @@ var KiiGatewayAgent = (function () {
         KiiGatewayAgent.preinit();
         this.isHttp = process.argv.indexOf('--mqtt') < 0;
         if (this.isHttp)
-            this.kii = new index_1.KiiHelper();
+            this.kii = new _1.KiiHelper();
         else {
-            this.kii = new index_1.KiiMqttHelper();
+            this.kii = new _1.KiiMqttHelper();
         }
         this.db = new low('./resource/db.json');
         this.kii.app = this.db.get('app').value();
@@ -55,6 +55,12 @@ var KiiGatewayAgent = (function () {
             _this.db.set('gateway', gateway).value();
             deferred.resolve(gateway);
         }, function (error) { return deferred.reject(error); });
+        return deferred.promise;
+    };
+    KiiGatewayAgent.prototype.loadGatewaySetting = function () {
+        var deferred = Q.defer();
+        this.kii.gateway = this.db.get('gateway').value();
+        deferred.resolve(this.kii.gateway);
         return deferred.promise;
     };
     KiiGatewayAgent.prototype.isGatewayOnboarding = function () {

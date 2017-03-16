@@ -1,6 +1,6 @@
 /// <reference types='node' />
-import { App, EndNode, EndNodes, Gateway, User } from './model/index';
-import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/index';
+import { App, EndNode, EndNodes, Gateway, User } from './model/';
+import { KiiBase, KiiHelper, KiiMqttHelper } from './KiiHelper/';
 
 import Q = require('q');
 import low = require('lowdb');
@@ -116,11 +116,25 @@ class KiiGatewayAgent {
    * @memberOf KiiGatewayAgent
    */
   onboardGatewayByOwner(properties?) {
-    let deferred = Q.defer()
+    let deferred = Q.defer();
     this.kii.onboardGatewayByOwner(properties).then((gateway: Gateway) => {
       this.db.set('gateway', gateway).value();
       deferred.resolve(gateway);
     }, error => deferred.reject(error))
+    return deferred.promise;
+  }
+
+  /**
+   * load gateway setting from db.json
+   *
+   * @returns {Promise}
+   *
+   * @memberOf KiiGatewayAgent
+   */
+  loadGatewaySetting() {
+    let deferred = Q.defer();
+    this.kii.gateway = this.db.get('gateway').value() as Gateway;
+    deferred.resolve(this.kii.gateway);
     return deferred.promise;
   }
 
