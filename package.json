@@ -1,6 +1,6 @@
 {
   "name": "kii-gateway-agent",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "kii-gateway-agent for node module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "docs": "node_modules/.bin/jsdoc -c jsdoc.json",
+    "docs": "jsdoc -c jsdoc.json",
     "check-engines": "check-engines",
     "staged-mods-ok": "git-mods --staged_ok",
     "no-mods": "git-mods",

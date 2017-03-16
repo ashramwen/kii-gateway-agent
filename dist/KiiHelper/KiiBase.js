@@ -116,6 +116,9 @@ var KiiBase = (function () {
         try {
             if (!this.cacheState.size().value())
                 return;
+            if (!this.validateBulkTime())
+                return;
+            console.log('ES Bulk.');
             this.getOwnedThings().then(function () {
                 var data = _this.traverseCacheState();
                 return _this.callESBulkApi(data);
@@ -126,6 +129,17 @@ var KiiBase = (function () {
         catch (err) {
             console.log('Bulk Error:', err);
         }
+    };
+    KiiBase.prototype.validateBulkTime = function () {
+        if (this.lastBulk) {
+            if (new Date().valueOf() > (this.lastBulk + 60000)) {
+                this.lastBulk = new Date().valueOf();
+                return true;
+            }
+            return false;
+        }
+        this.lastBulk = new Date().valueOf();
+        return false;
     };
     KiiBase.prototype.traverseCacheState = function () {
         var _this = this;

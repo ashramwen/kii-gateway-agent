@@ -60,6 +60,7 @@ export abstract class KiiBase {
    */
   private cache: any = new low('./resource/stateCache.json');
   private cacheState: any;
+  private lastBulk: number;
 
   /**
    * things that user owns
@@ -256,6 +257,8 @@ export abstract class KiiBase {
   public bulkES() {
     try {
       if (!this.cacheState.size().value()) return;
+      if (!this.validateBulkTime()) return;
+      console.log('ES Bulk.');
       this.getOwnedThings().then(() => {
         let data = this.traverseCacheState();
         return this.callESBulkApi(data);
@@ -266,6 +269,18 @@ export abstract class KiiBase {
     catch (err) {
       console.log('Bulk Error:', err);
     }
+  }
+
+  private validateBulkTime(): boolean {
+    if (this.lastBulk) {
+      if (new Date().valueOf() > (this.lastBulk + 60000)) {
+        this.lastBulk = new Date().valueOf();
+        return true;
+      }
+      return false;
+    }
+    this.lastBulk = new Date().valueOf();
+    return false;
   }
 
   /**
